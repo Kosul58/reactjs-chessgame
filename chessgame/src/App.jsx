@@ -15,6 +15,7 @@ import wp from "./assets/wp.png";
 import { use } from "react";
 
 function App() {
+  const [board, setBoard] = useState(initialBoard); // State to track the board
   const [boardpiece, setBoardpiece] = useState([]);
   let [piececontroller, setPiececontroller] = useState(false);
   const [prevpos, setPrevpos] = useState(null);
@@ -141,8 +142,6 @@ function App() {
     } finally {
     }
   };
-
-  const [board, setBoard] = useState(initialBoard); // State to track the board
 
   return (
     <div className="chessgame">
