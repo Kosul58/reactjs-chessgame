@@ -12,9 +12,12 @@ import wn from "./assets/wn.png";
 import wr from "./assets/wr.png";
 import wq from "./assets/wq.png";
 import wp from "./assets/wp.png";
+import { use } from "react";
 
 function App() {
-  const [boardpiece, setBoardpiece] = useState(null);
+  const [boardpiece, setBoardpiece] = useState([]);
+  let [piececontroller, setPiececontroller] = useState(false);
+  const [prevpos, setPrevpos] = useState(null);
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
   const whiteMajorPieces = [wr, wn, wb, wq, wk, wb, wn, wr];
@@ -32,6 +35,7 @@ function App() {
 
   const movepawn = (row, col, piece) => {
     console.log(row, col, piece, "pawn");
+    setPrevpos([row, col]);
     const index = row * 8 + col;
     let move1 = null;
     let move2 = null;
@@ -44,7 +48,6 @@ function App() {
       move1 = (row + 1) * 8 + col; // Single forward move for black pawn
       if (row === 1) move2 = (row + 2) * 8 + col; // Double forward move for black pawn
     }
-
     console.log(`Current Index: ${index}, Move1: ${move1}, Move2: ${move2}`);
 
     // Update the board visually by toggling classes
@@ -83,32 +86,59 @@ function App() {
     const index = row * 8 + col;
   };
 
-  const movepiece = () => {
-    console.log("movepiece");
+  const movepiece = (row, col, piece) => {
+    console.log("ya");
+    const targetIndex = row * 8 + col; // Target square index
+    const [prevRow, prevCol] = prevpos; // Previous position
+    const prevIndex = prevRow * 8 + prevCol; // Previous square index
+
+    // Create a copy of the board to update
+    const updatedBoard = [...board];
+
+    // Move the piece
+    updatedBoard[targetIndex] = boardpiece; // Place the piece on the target square
+    updatedBoard[prevIndex] = null; // Clear the previous square
+
+    // Update the board state
+    setBoard(updatedBoard);
+
+    // Clear the piececontroller and boardpiece states
+    setPiececontroller(false);
+    setBoardpiece(null);
+
+    // Remove visual highlights
+    document.querySelectorAll(".square").forEach((square) => {
+      square.classList.remove("selected", "mover");
+    });
   };
 
   const showpath = async (row, col, piece) => {
     try {
-      if (piece === null) return;
-      if (piece.includes("wp") || piece.includes("bp")) {
-        movepawn(row, col, piece);
-      } else if (piece.includes("wk") || piece.includes("bk")) {
-        moveking(row, col, piece);
-      } else if (piece.includes("wr") || piece.includes("br")) {
-        moverook(row, col, piece);
-      } else if (piece.includes("wb") || piece.includes("bb")) {
-        movebishop(row, col, piece);
-      } else if (piece.includes("wn") || piece.includes("bn")) {
-        moveknight(row, col, piece);
-      } else if (piece.includes("wq") || piece.includes("bq")) {
-        movequeen(row, col, piece);
-      } else if (piece.includes("wk") || piece.includes("bk")) {
-        moveking(row, col, piece);
+      console.log(row, col);
+      if (piece == null && piececontroller == false) return;
+      if (piece == null && piececontroller == true) {
+        movepiece(row, col, piece);
+      } else {
+        if (piece.includes("wp") || piece.includes("bp")) {
+          movepawn(row, col, piece);
+          setPiececontroller(true);
+        } else if (piece.includes("wk") || piece.includes("bk")) {
+          moveking(row, col, piece);
+        } else if (piece.includes("wr") || piece.includes("br")) {
+          moverook(row, col, piece);
+        } else if (piece.includes("wb") || piece.includes("bb")) {
+          movebishop(row, col, piece);
+        } else if (piece.includes("wn") || piece.includes("bn")) {
+          moveknight(row, col, piece);
+        } else if (piece.includes("wq") || piece.includes("bq")) {
+          movequeen(row, col, piece);
+        } else if (piece.includes("wk") || piece.includes("bk")) {
+          moveking(row, col, piece);
+        }
       }
     } catch (e) {
       console.log(e);
     } finally {
-      movepiece();
     }
   };
 
