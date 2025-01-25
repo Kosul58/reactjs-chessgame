@@ -1,0 +1,87 @@
+body {
+  background: linear-gradient(to right, #ff7e5f, #88db6a);
+  height: 100svh;
+  width: 100svw;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  text-align: center;
+}
+
+.chessgame {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 80svw;
+  aspect-ratio: 16/10;
+  background-color: rgba(210, 196, 224, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.gameplay {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  width: 70%;
+  height: 95%;
+  background-color: rgba(141, 207, 225, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.gamecontrol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+  width: 25%;
+  height: 95%;
+  background-color: rgba(98, 19, 177, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  width: 92%;
+  height: 55px;
+  flex-direction: row;
+  padding: 10px 10px;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.square {
+  display: flex;
+  width: 90px;
+  height: 80px;
+  flex-direction: row;
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.square:hover {
+  cursor: pointer;
+  scale: 1.05;
+}
