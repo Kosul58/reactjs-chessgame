@@ -14,6 +14,7 @@ import wq from "./assets/wq.png";
 import wp from "./assets/wp.png";
 
 function App() {
+  const [boardpiece, setBoardpiece] = useState(null);
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
   const whiteMajorPieces = [wr, wn, wb, wq, wk, wb, wn, wr];
@@ -28,6 +29,88 @@ function App() {
     initialBoard[48 + i] = wp; // White pawns (row 6)
     initialBoard[56 + i] = whiteMajorPieces[i]; // White pieces (row 7)
   });
+
+  const movepawn = (row, col, piece) => {
+    console.log(row, col, piece, "pawn");
+    const index = row * 8 + col;
+    let move1 = null;
+    let move2 = null;
+    setBoardpiece(piece);
+    // Determine the possible moves
+    if (piece.includes("wp")) {
+      move1 = (row - 1) * 8 + col; // Single forward move for white pawn
+      if (row === 6) move2 = (row - 2) * 8 + col; // Double forward move for white pawn
+    } else if (piece.includes("bp")) {
+      move1 = (row + 1) * 8 + col; // Single forward move for black pawn
+      if (row === 1) move2 = (row + 2) * 8 + col; // Double forward move for black pawn
+    }
+
+    console.log(`Current Index: ${index}, Move1: ${move1}, Move2: ${move2}`);
+
+    // Update the board visually by toggling classes
+    document.querySelectorAll(".square").forEach((square, i) => {
+      square.classList.remove("selected", "mover");
+      if (i === index) {
+        square.classList.add("mover"); // Highlight current piece
+      } else if (i === move1 || i === move2) {
+        square.classList.add("selected"); // Highlight possible moves
+      }
+    });
+  };
+
+  const moverook = (row, col, piece) => {
+    console.log(row, col, piece, "rook");
+    const index = row * 8 + col;
+  };
+
+  const movebishop = (row, col, piece) => {
+    console.log(row, col, piece, "bishop");
+    const index = row * 8 + col;
+  };
+
+  const moveknight = (row, col, piece) => {
+    console.log(row, col, piece, "knight");
+    const index = row * 8 + col;
+  };
+
+  const movequeen = (row, col, piece) => {
+    console.log(row, col, piece, "queen");
+    const index = row * 8 + col;
+  };
+
+  const moveking = (row, col, piece) => {
+    console.log(row, col, piece, "king");
+    const index = row * 8 + col;
+  };
+
+  const movepiece = () => {
+    console.log("movepiece");
+  };
+
+  const showpath = async (row, col, piece) => {
+    try {
+      if (piece === null) return;
+      if (piece.includes("wp") || piece.includes("bp")) {
+        movepawn(row, col, piece);
+      } else if (piece.includes("wk") || piece.includes("bk")) {
+        moveking(row, col, piece);
+      } else if (piece.includes("wr") || piece.includes("br")) {
+        moverook(row, col, piece);
+      } else if (piece.includes("wb") || piece.includes("bb")) {
+        movebishop(row, col, piece);
+      } else if (piece.includes("wn") || piece.includes("bn")) {
+        moveknight(row, col, piece);
+      } else if (piece.includes("wq") || piece.includes("bq")) {
+        movequeen(row, col, piece);
+      } else if (piece.includes("wk") || piece.includes("bk")) {
+        moveking(row, col, piece);
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      movepiece();
+    }
+  };
 
   const [board, setBoard] = useState(initialBoard); // State to track the board
 
@@ -51,6 +134,9 @@ function App() {
                     backgroundSize: "contain",
                     backgroundRepeat: "no-repeat",
                     backgroundPosition: "center",
+                  }}
+                  onClick={() => {
+                    showpath(rowIndex, colIndex, board[index]);
                   }}
                 ></div>
               );
