@@ -30,8 +30,8 @@ function App() {
   // Set black and white pieces dynamically
   blackMajorPieces.forEach((piece, i) => {
     initialBoard[i] = piece; // Black pieces (row 0)
-    // initialBoard[8 + i] = bp; // Black pawns (row 1)
-    // initialBoard[48 + i] = wp; // White pawns (row 6)
+    initialBoard[8 + i] = bp; // Black pawns (row 1)
+    initialBoard[48 + i] = wp; // White pawns (row 6)
     initialBoard[56 + i] = whiteMajorPieces[i]; // White pieces (row 7)
   });
 
