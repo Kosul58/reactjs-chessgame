@@ -79,6 +79,7 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  z-index: 1;
 }
 
 .square:hover {
@@ -88,6 +89,7 @@ body {
 
 .selected {
   background-color: rgba(7, 186, 10, 0.5) !important;
+  z-index: 8;
 }
 
 .mover {
