@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import bk from "./assets/bk.png";
 import bb from "./assets/bb.png";
@@ -21,7 +21,7 @@ function App() {
   const [prevpos, setPrevpos] = useState(null);
   const [wkingchecked, setWkingchecked] = useState("");
   const [bkingchecked, setBkingchecked] = useState("");
-  const [rookpos, setRookpos] = useState(null);
+  const [iskingcheck, setIskingcheck] = useState("a");
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
   const whiteMajorPieces = [wr, wn, wb, wq, wk, wb, wn, wr];
@@ -223,110 +223,6 @@ function App() {
     return moves;
   };
 
-  // const moveknight = (row, col, piece) => {
-  //   console.log(row, col, piece, "knight");
-  //   setPrevpos([row, col]);
-  //   setBoardpiece(piece);
-  //   const index = row * 8 + col;
-  //   let move1 = null;
-  //   let move2 = null;
-  //   let move3 = null;
-  //   let move4 = null;
-  //   let move5 = null;
-  //   let move6 = null;
-  //   let move7 = null;
-  //   let move8 = null;
-
-  //   // Determine the possible moves
-  //   if (piece.includes("wn")) {
-  //     if (row - 1 >= 0 && col - 2 >= 0) move1 = (row - 1) * 8 + (col - 2);
-  //     if (row - 2 >= 0 && col - 1 >= 0) move2 = (row - 2) * 8 + (col - 1);
-  //     if (row - 2 >= 0 && col + 1 <= 7) move3 = (row - 2) * 8 + (col + 1);
-  //     if (row - 1 >= 0 && col + 2 <= 7) move4 = (row - 1) * 8 + (col + 2);
-  //     if (row + 1 <= 7 && col + 2 <= 7) move5 = (row + 1) * 8 + (col + 2);
-  //     if (row + 2 <= 7 && col + 1 <= 7) move6 = (row + 2) * 8 + (col + 1);
-  //     if (row + 2 <= 7 && col - 1 >= 0) move7 = (row + 2) * 8 + (col - 1);
-  //     if (row + 1 <= 7 && col - 2 >= 0) move8 = (row + 1) * 8 + (col - 2);
-  //   } else if (piece.includes("bn")) {
-  //     if (row - 1 >= 0 && col - 2 >= 0) move1 = (row - 1) * 8 + (col - 2);
-  //     if (row - 2 >= 0 && col - 1 >= 0) move2 = (row - 2) * 8 + (col - 1);
-  //     if (row - 2 >= 0 && col + 1 <= 7) move3 = (row - 2) * 8 + (col + 1);
-  //     if (row - 1 >= 0 && col + 2 <= 7) move4 = (row - 1) * 8 + (col + 2);
-  //     if (row + 1 <= 7 && col + 2 <= 7) move5 = (row + 1) * 8 + (col + 2);
-  //     if (row + 2 <= 7 && col + 1 <= 7) move6 = (row + 2) * 8 + (col + 1);
-  //     if (row + 2 <= 7 && col - 1 >= 0) move7 = (row + 2) * 8 + (col - 1);
-  //     if (row + 1 <= 7 && col - 2 >= 0) move8 = (row + 1) * 8 + (col - 2);
-  //   }
-  //   const j = piece.split("/").pop().split(".")[0][0];
-  //   if (board[move1]) {
-  //     const j1 = board[move1].split("/").pop().split(".")[0][0];
-  //     let temp = move1;
-  //     move1 = null;
-  //     if (j !== j1) move1 = temp;
-  //   }
-  //   if (board[move2]) {
-  //     const j2 = board[move2].split("/").pop().split(".")[0][0];
-  //     let temp = move2;
-  //     move2 = null;
-  //     if (j !== j2) move2 = temp;
-  //   }
-  //   if (board[move3]) {
-  //     const j3 = board[move3].split("/").pop().split(".")[0][0];
-  //     let temp = move3;
-  //     move3 = null;
-  //     if (j !== j3) move3 = temp;
-  //   }
-  //   if (board[move4]) {
-  //     const j4 = board[move4].split("/").pop().split(".")[0][0];
-  //     let temp = move4;
-  //     move4 = null;
-  //     if (j !== j4) move4 = temp;
-  //   }
-  //   if (board[move5]) {
-  //     const j5 = board[move5].split("/").pop().split(".")[0][0];
-  //     let temp = move5;
-  //     move5 = null;
-  //     if (j !== j5) move5 = temp;
-  //   }
-  //   if (board[move6]) {
-  //     const j6 = board[move6].split("/").pop().split(".")[0][0];
-  //     let temp = move6;
-  //     move6 = null;
-  //     if (j !== j6) move6 = temp;
-  //   }
-  //   if (board[move7]) {
-  //     const j7 = board[move7].split("/").pop().split(".")[0][0];
-  //     let temp = move7;
-  //     move7 = null;
-  //     if (j !== j7) move7 = temp;
-  //   }
-  //   if (board[move8]) {
-  //     const j8 = board[move8].split("/").pop().split(".")[0][0];
-  //     let temp = move8;
-  //     move8 = null;
-  //     if (j !== j8) move8 = temp;
-  //   }
-
-  //   // Update the board visually by toggling classes
-  //   document.querySelectorAll(".square").forEach((square, i) => {
-  //     square.classList.remove("selected", "mover");
-  //     if (i === index) {
-  //       square.classList.add("mover"); // Highlight current piece
-  //     } else if (
-  //       i === move1 ||
-  //       i === move2 ||
-  //       i === move3 ||
-  //       i == move4 ||
-  //       i === move5 ||
-  //       i === move6 ||
-  //       i === move7 ||
-  //       i === move8
-  //     ) {
-  //       square.classList.add("selected"); // Highlight possible moves
-  //     }
-  //   });
-  // };
-
   const moveknight = (row, col, piece) => {
     setPrevpos([row, col]);
     setBoardpiece(piece);
@@ -442,112 +338,6 @@ function App() {
     });
     return moves;
   };
-
-  // const moveking = (row, col, piece) => {
-  //   console.log(row, col, piece, "king");
-  //   const index = row * 8 + col;
-  //   setPrevpos([row, col]);
-  //   let move1 = null;
-  //   let move2 = null;
-  //   let move3 = null;
-  //   let move4 = null;
-  //   let ul = null;
-  //   let ur = null;
-  //   let dl = null;
-  //   let dr = null;
-  //   setBoardpiece(piece);
-  //   console.log(index);
-
-  //   // Determine the possible moves
-  //   if (piece.includes("wk")) {
-  //     move1 = (row - 1) * 8 + col; //up
-  //     move2 = row * 8 + (col - 1); //left
-  //     move3 = row * 8 + (col + 1); //right
-  //     move4 = (row + 1) * 8 + col; //bottom
-  //     ul = (row - 1) * 8 + (col - 1); //upleft
-  //     ur = (row - 1) * 8 + (col + 1); //upright
-  //     dl = (row + 1) * 8 + (col - 1); //downleft
-  //     dr = (row + 1) * 8 + (col + 1); //downright
-  //   } else if (piece.includes("bk")) {
-  //     move1 = (row + 1) * 8 + col;
-  //     move2 = row * 8 + (col - 1);
-  //     move3 = row * 8 + (col + 1);
-  //     move4 = (row - 1) * 8 + col;
-  //     ul = (row + 1) * 8 + (col - 1);
-  //     ur = (row + 1) * 8 + (col + 1);
-  //     dl = (row - 1) * 8 + (col - 1);
-  //     dr = (row - 1) * 8 + (col + 1);
-  //   }
-  //   const j = piece.split("/").pop().split(".")[0][0];
-
-  //   if (board[move1]) {
-  //     const j1 = board[move1].split("/").pop().split(".")[0][0];
-  //     let temp = move1;
-  //     move1 = null;
-  //     if (j !== j1) move1 = temp;
-  //   }
-  //   if (board[move2]) {
-  //     const j2 = board[move2].split("/").pop().split(".")[0][0];
-  //     let temp = move2;
-  //     move2 = null;
-  //     if (j !== j2) move2 = temp;
-  //   }
-  //   if (board[move3]) {
-  //     const j3 = board[move3].split("/").pop().split(".")[0][0];
-  //     let temp = move3;
-  //     move3 = null;
-  //     if (j !== j3) move3 = temp;
-  //   }
-  //   if (board[move4]) {
-  //     const j4 = board[move4].split("/").pop().split(".")[0][0];
-  //     let temp = move4;
-  //     move4 = null;
-  //     if (j !== j4) move4 = temp;
-  //   }
-  //   if (board[ul]) {
-  //     const j5 = board[ul].split("/").pop().split(".")[0][0];
-  //     let temp = ul;
-  //     ul = null;
-  //     if (j !== j5) ul = temp;
-  //   }
-  //   if (board[ur]) {
-  //     const j6 = board[ur].split("/").pop().split(".")[0][0];
-  //     let temp = ur;
-  //     ur = null;
-  //     if (j !== j6) ur = temp;
-  //   }
-  //   if (board[dl]) {
-  //     const j7 = board[dl].split("/").pop().split(".")[0][0];
-  //     let temp = dl;
-  //     dl = null;
-  //     if (j !== j7) dl = temp;
-  //   }
-  //   if (board[dr]) {
-  //     const j8 = board[dr].split("/").pop().split(".")[0][0];
-  //     let temp = dr;
-  //     dr = null;
-  //     if (j !== j8) dr = temp;
-  //   }
-
-  //   // Update the board visually by toggling classes
-  //   document.querySelectorAll(".square").forEach((square, i) => {
-  //     square.classList.remove("selected", "mover");
-  //     if (i === index) {
-  //       square.classList.add("mover"); // Highlight current piece
-  //     } else if (
-  //       i === move1 ||
-  //       i === move2 ||
-  //       i === move3 ||
-  //       i == move4 ||
-  //       i === ul ||
-  //       i === ur ||
-  //       i === dl ||
-  //       i === dr
-  //     ) {
-  //       square.classList.add("selected"); // Highlight possible moves
-  //     }
-  //   });
-  // };
 
   const moveking = (row, col, piece) => {
     const index = row * 8 + col;
@@ -765,12 +555,12 @@ function App() {
     // Toggle the turn
     setTurn(turn === "w" ? "b" : "w");
   };
-
   const showpath = async (row, col, piece) => {
     let j;
     try {
       if (piece) {
         j = piece.split("/").pop().split(".")[0][0];
+
         if (j !== turn && piececontroller == false) {
           return;
         }
