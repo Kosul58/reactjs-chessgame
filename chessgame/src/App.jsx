@@ -848,7 +848,6 @@ function App() {
 
   const movepiece = (row, col, piece) => {
     console.log("Attempting to move piece...");
-
     // Check if the move is valid
     if (!selectcheck(row, col)) {
       console.log("Invalid move: The square is not selected.");
@@ -856,7 +855,6 @@ function App() {
     }
 
     console.log("Valid move detected.");
-
     // Indices for the target and previous squares
     const targetIndex = row * 8 + col;
     const [prevRow, prevCol] = prevpos;
