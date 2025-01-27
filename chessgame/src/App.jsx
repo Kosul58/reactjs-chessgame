@@ -21,6 +21,8 @@ function App() {
   const [prevpos, setPrevpos] = useState(null);
   const [wkingchecked, setWkingchecked] = useState("");
   const [bkingchecked, setBkingchecked] = useState("");
+  const [counterx, setCounterx] = useState("");
+
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
   const whiteMajorPieces = [wr, wn, wb, wq, wk, wb, wn, wr];
@@ -117,6 +119,7 @@ function App() {
         }
       });
     }
+    setCounterx("wp");
     return moves;
   };
 
@@ -171,6 +174,7 @@ function App() {
         }
       });
     }
+    setCounterx("wr");
     return moves;
   };
 
@@ -227,6 +231,7 @@ function App() {
         }
       });
     }
+    setCounterx("wb");
     return moves;
   };
 
@@ -286,6 +291,7 @@ function App() {
         }
       });
     }
+    setCounterx("wn");
     return moves;
   };
 
@@ -330,7 +336,6 @@ function App() {
           moves.push(moveIndex);
           break; // Stop further movement in this direction
         }
-
         // Add the square as a valid move
         moves.push(moveIndex);
       }
@@ -347,6 +352,7 @@ function App() {
         }
       });
     }
+    setCounterx("wq");
     return moves;
   };
 
@@ -394,57 +400,6 @@ function App() {
         }
       }
     });
-
-    // if (!kingchecked) {
-    //   if (row == 0 || row == 7) {
-    //     if (piece.includes("bk")) {
-    //       let kl1 = row * 8 + (col - 1);
-    //       let kl2 = row * 8 + (col - 2);
-    //       let kl3 = row * 8 + (col - 3);
-    //       let kr1 = row * 8 + (col + 1);
-    //       let kr2 = row * 8 + (col + 2);
-    //       let kr3 = row * 8 + (col + 3);
-    //       if (board[kl1] && board[kl2]) {
-    //         move1 = null;
-    //       } else {
-    //         if (board[kl3] == "/src/assets/br.png") {
-    //           move1 = row * 8 + (col - 2);
-    //         }
-    //       }
-    //       if (board[kr1] && board[kr2]) {
-    //         move2 = null;
-    //       } else {
-    //         if (board[kr3] == "/src/assets/br.png") {
-    //           move2 = row * 8 + (col + 2);
-    //         }
-    //       }
-    //     } else if (piece.includes("wk")) {
-    //       let kl1 = row * 8 + (col - 1);
-    //       let kl2 = row * 8 + (col - 2);
-    //       let kl3 = row * 8 + (col - 3);
-    //       let kr1 = row * 8 + (col + 1);
-    //       let kr2 = row * 8 + (col + 2);
-    //       let kr3 = row * 8 + (col + 3);
-    //       if (!board[kl1] && !board[kl2]) {
-    //         if (board[kl3] == "/src/assets/wr.png") {
-    //           move1 = row * 8 + (col - 2);
-    //         }
-    //       } else {
-    //         move1 = null;
-    //       }
-    //       if (!board[kr1] && !board[kr2]) {
-    //         if (board[kr3] == "/src/assets/wr.png") {
-    //           move2 = row * 8 + (col + 2);
-    //         }
-    //       } else {
-    //         move2 = null;
-    //       }
-    //     }
-    //     moves.push(move1);
-    //     moves.push(move2);
-    //   }
-    // }
-    // Update the board visually by toggling classes
 
     if (!bkingchecked) {
       if (row === 0) {
@@ -499,6 +454,7 @@ function App() {
         }
       });
     }
+    setCounterx("wk");
     return moves;
   };
 
@@ -510,6 +466,7 @@ function App() {
 
   const checkassure2 = async () => {
     // Map board pieces to their respective move functions
+    console.log("yy");
     const moveFunctions = {
       "/src/assets/wq.png": movequeen,
       "/src/assets/bq.png": movequeen,
@@ -547,34 +504,35 @@ function App() {
       if (boardpiece) {
         const row = Math.floor(i / 8);
         const col = i % 8;
-        // Determine the appropriate move function and target king
         const moveFunction = moveFunctions[boardpiece];
         const targetKing = targetKings[boardpiece];
 
-        console.log(targetKing);
-        let a = 10;
         // Get possible moves for the current piece
-        const possibleMoves = moveFunction(row, col, boardpiece, a);
+        const possibleMoves = moveFunction(row, col, boardpiece, 10);
+
         // Check if any of the moves threaten the target king
         for (let i = 0; i < possibleMoves.length; i++) {
           const targetIndex = possibleMoves[i];
+
           if (board[targetIndex] === targetKing) {
             console.log(
-              `The ${targetKing} is being targeted at ${targetIndex}`
+              `The ${targetKing} is being targeted at ${targetIndex} by ${boardpiece} at ${row} ,${col}`
             );
             // Set the appropriate state for the king in check
             if (targetKing === "/src/assets/bk.png") {
-              setBkingchecked("b");
+              if (!bkingchecked) {
+                setBkingchecked("b");
+              }
             } else if (targetKing === "/src/assets/wk.png") {
-              setWkingchecked("w");
+              if (!wkingchecked) {
+                setWkingchecked("w");
+              }
             }
-          } else {
           }
         }
       }
     }
   };
-
   const movepiece = async (row, col, piece) => {
     console.log("Attempting to move piece...");
     // Check if the move is valid
@@ -591,7 +549,6 @@ function App() {
 
     // Create a copy of the board
     const updatedBoard = [...board];
-
     // Move the piece
     updatedBoard[targetIndex] = boardpiece;
     updatedBoard[prevIndex] = null;
@@ -620,13 +577,11 @@ function App() {
           : "/src/assets/br.png"; // Place the rook in its new position
       }
     }
-
     // Update the board state
     setBoard(updatedBoard);
     // Clear piececontroller and boardpiece states
     setPiececontroller(false);
     setBoardpiece(null);
-
     // Remove visual highlights
     document.querySelectorAll(".square").forEach((square) => {
       square.classList.remove("selected", "mover");
@@ -635,14 +590,13 @@ function App() {
 
     setTurn(turn === "w" ? "b" : "w");
   };
+
   const showpath = async (row, col, piece) => {
     let j;
-    await checkassure2();
     try {
       if (piece) {
         j = piece.split("/").pop().split(".")[0][0];
         console.log("xx");
-
         if (j !== turn && piececontroller == false) {
           return;
         }
@@ -685,6 +639,11 @@ function App() {
   };
 
   const [board, setBoard] = useState(initialBoard); // State to track the board
+
+  useEffect(() => {
+    checkassure2();
+  }, [board, counterx]);
+
   return (
     <div className="chessgame">
       <div className="gameplay">

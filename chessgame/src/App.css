@@ -97,5 +97,5 @@ body {
 }
 
 .check {
-  box-shadow: 0 0 10px rgba(239, 0, 0, 0.9);
+  box-shadow: 0 0 10px rgba(239, 0, 0, 0.9) !important;
 }

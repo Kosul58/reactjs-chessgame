@@ -1067,3 +1067,39 @@ const checkassure2 = (row, col, boardpiece) => {
     }
   }
 };
+
+return (
+  <div className="chessgame">
+    <div className="gameplay">
+      {Array.from({ length: 8 }, (_, rowIndex) => (
+        <div className="row" key={rowIndex} style={{ display: "flex" }}>
+          {Array.from({ length: 8 }, (_, colIndex) => {
+            const index = rowIndex * 8 + colIndex;
+            const isWhiteSquare = (rowIndex + colIndex) % 2 === 0;
+            return (
+              <div
+                key={index}
+                className="square"
+                style={{
+                  width: "50px", // Adjust to desired square size
+                  height: "50px", // Adjust to desired square size
+                  backgroundColor: isWhiteSquare ? "white" : "black",
+                  backgroundImage: board[index]
+                    ? `url(${board[index]})`
+                    : "none",
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center",
+                }}
+                onClick={() => {
+                  showpath(rowIndex, colIndex, board[index]);
+                }}
+              ></div>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+    <div className="gamecontrol"></div>
+  </div>
+);
