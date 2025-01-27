@@ -1002,7 +1002,7 @@ useEffect(() => {
 }, [iskingcheck]);
 
 ///////////////////////////////////////
-const checkassure2 = (row, col, boardpiece) => {
+const checkassurex = (row, col, boardpiece) => {
   // Map board pieces to their respective move functions
   const moveFunctions = {
     "/src/assets/wq.png": movequeen,
@@ -1051,6 +1051,12 @@ const checkassure2 = (row, col, boardpiece) => {
   for (let i = 0; i < possibleMoves.length; i++) {
     const targetIndex = possibleMoves[i];
     if (board[targetIndex] === targetKing) {
+      document.querySelectorAll(".square").forEach((square, i) => {
+        square.classList.remove("check");
+        if (i == targetIndex) {
+          square.classList.add("check");
+        }
+      });
       console.log(
         `${
           targetKing === "/src/assets/bk.png" ? "Black" : "White"

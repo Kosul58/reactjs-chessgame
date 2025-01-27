@@ -12,7 +12,6 @@ import wn from "./assets/wn.png";
 import wr from "./assets/wr.png";
 import wq from "./assets/wq.png";
 import wp from "./assets/wp.png";
-import { use } from "react";
 
 function App() {
   const [boardpiece, setBoardpiece] = useState([]);
@@ -21,7 +20,6 @@ function App() {
   const [prevpos, setPrevpos] = useState(null);
   const [wkingchecked, setWkingchecked] = useState("");
   const [bkingchecked, setBkingchecked] = useState("");
-  const [counterx, setCounterx] = useState("");
 
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
@@ -37,12 +35,6 @@ function App() {
     // initialBoard[48 + i] = wp; // White pawns (row 6)
     initialBoard[56 + i] = whiteMajorPieces[i]; // White pieces (row 7)
   });
-
-  // const friendcheck = async (a, b) => {
-  //   const x = a.split("/").pop().split(".")[0];
-  //   const y = b.split("/").pop().split(".")[0];
-  //   if (x == y) return true;
-  // };
 
   const movepawn = (row, col, piece, a) => {
     if (!a) {
@@ -119,7 +111,6 @@ function App() {
         }
       });
     }
-    setCounterx("wp");
     return moves;
   };
 
@@ -174,7 +165,6 @@ function App() {
         }
       });
     }
-    setCounterx("wr");
     return moves;
   };
 
@@ -231,7 +221,6 @@ function App() {
         }
       });
     }
-    setCounterx("wb");
     return moves;
   };
 
@@ -291,7 +280,6 @@ function App() {
         }
       });
     }
-    setCounterx("wn");
     return moves;
   };
 
@@ -352,7 +340,6 @@ function App() {
         }
       });
     }
-    setCounterx("wq");
     return moves;
   };
 
@@ -454,7 +441,6 @@ function App() {
         }
       });
     }
-    setCounterx("wk");
     return moves;
   };
 
@@ -464,9 +450,81 @@ function App() {
     return square.classList.contains("selected"); // Check if it contains the 'selected' class
   };
 
+  const checkassurex = (row, col, boardpiece) => {
+    console.log("101");
+    // Map board pieces to their respective move functions
+    const moveFunctions = {
+      "/src/assets/wq.png": movequeen,
+      "/src/assets/bq.png": movequeen,
+      "/src/assets/wr.png": moverook,
+      "/src/assets/br.png": moverook,
+      "/src/assets/wb.png": movebishop,
+      "/src/assets/bb.png": movebishop,
+      "/src/assets/wn.png": moveknight,
+      "/src/assets/bn.png": moveknight,
+      "/src/assets/wp.png": movepawn,
+      "/src/assets/bp.png": movepawn,
+      "/src/assets/wk.png": moveking,
+      "/src/assets/bk.png": moveking,
+    };
+
+    // Map board pieces to the respective kings they might check
+    const targetKings = {
+      "/src/assets/wq.png": "/src/assets/bk.png",
+      "/src/assets/wr.png": "/src/assets/bk.png",
+      "/src/assets/wb.png": "/src/assets/bk.png",
+      "/src/assets/wn.png": "/src/assets/bk.png",
+      "/src/assets/wp.png": "/src/assets/bk.png",
+      "/src/assets/wk.png": "/src/assets/bk.png",
+
+      "/src/assets/bq.png": "/src/assets/wk.png",
+      "/src/assets/br.png": "/src/assets/wk.png",
+      "/src/assets/bb.png": "/src/assets/wk.png",
+      "/src/assets/bn.png": "/src/assets/wk.png",
+      "/src/assets/bp.png": "/src/assets/wk.png",
+      "/src/assets/bk.png": "/src/assets/wk.png",
+    };
+
+    // Determine the appropriate move function and target king
+    const moveFunction = moveFunctions[boardpiece];
+    const targetKing = targetKings[boardpiece];
+    if (!moveFunction || !targetKing) {
+      console.warn("Invalid boardpiece or unsupported move function");
+      return;
+    }
+    let a = 10;
+    // Get possible moves for the current piece
+    const possibleMoves = moveFunction(row, col, boardpiece, a);
+
+    // Check if any of the moves threaten the target king
+    for (let i = 0; i < possibleMoves.length; i++) {
+      const targetIndex = possibleMoves[i];
+      if (board[targetIndex] === targetKing) {
+        document.querySelectorAll(".square").forEach((square, i) => {
+          // square.classList.remove("check");
+          if (i == targetIndex) {
+            square.classList.add("check");
+          }
+        });
+        console.log(
+          `${
+            targetKing === "/src/assets/bk.png" ? "Black" : "White"
+          } king is in check at index:`,
+          targetIndex
+        );
+        // Set the appropriate state for the king in check
+        if (targetKing === "/src/assets/bk.png") {
+          setBkingchecked("b");
+        } else {
+          setWkingchecked("w");
+        }
+        break;
+      }
+    }
+  };
+
   const checkassure2 = async () => {
     // Map board pieces to their respective move functions
-    console.log("yy");
     const moveFunctions = {
       "/src/assets/wq.png": movequeen,
       "/src/assets/bq.png": movequeen,
@@ -515,6 +573,12 @@ function App() {
           const targetIndex = possibleMoves[i];
 
           if (board[targetIndex] === targetKing) {
+            document.querySelectorAll(".square").forEach((square, i) => {
+              // square.classList.remove("check");
+              if (i == targetIndex) {
+                square.classList.add("check");
+              }
+            });
             console.log(
               `The ${targetKing} is being targeted at ${targetIndex} by ${boardpiece} at ${row} ,${col}`
             );
@@ -533,6 +597,7 @@ function App() {
       }
     }
   };
+
   const movepiece = async (row, col, piece) => {
     console.log("Attempting to move piece...");
     // Check if the move is valid
@@ -579,6 +644,10 @@ function App() {
     }
     // Update the board state
     setBoard(updatedBoard);
+
+    if (boardpiece) {
+      checkassurex(row, col, boardpiece);
+    }
     // Clear piececontroller and boardpiece states
     setPiececontroller(false);
     setBoardpiece(null);
@@ -587,7 +656,6 @@ function App() {
       square.classList.remove("selected", "mover");
     });
     console.log("Piece moved successfully!");
-
     setTurn(turn === "w" ? "b" : "w");
   };
 
@@ -638,11 +706,17 @@ function App() {
     }
   };
 
+  const movekingifcheck = () => {
+    return Array.from(document.querySelectorAll(".square")).some((square) =>
+      square.classList.contains("check")
+    );
+  };
+
   const [board, setBoard] = useState(initialBoard); // State to track the board
 
   useEffect(() => {
     checkassure2();
-  }, [board, counterx]);
+  }, [board]);
 
   return (
     <div className="chessgame">
