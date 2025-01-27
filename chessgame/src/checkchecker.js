@@ -428,10 +428,6 @@ const checkchecker = async () => {
 
 ///////////////////////////////////////////
 const checkassure = (row, col, boardpiece) => {
-  // for (let i = 0; i <= board.length; i++) {
-  //   console.log(board[i]);
-  // }
-
   // Get all possible moves for the queen
   const possibleMoves = movequeen(row, col, boardpiece);
   // Check for white queen attacking the black king
@@ -1004,3 +1000,70 @@ useEffect(() => {
   };
   checkchecker();
 }, [iskingcheck]);
+
+///////////////////////////////////////
+const checkassure2 = (row, col, boardpiece) => {
+  // Map board pieces to their respective move functions
+  const moveFunctions = {
+    "/src/assets/wq.png": movequeen,
+    "/src/assets/bq.png": movequeen,
+    "/src/assets/wr.png": moverook,
+    "/src/assets/br.png": moverook,
+    "/src/assets/wb.png": movebishop,
+    "/src/assets/bb.png": movebishop,
+    "/src/assets/wn.png": moveknight,
+    "/src/assets/bn.png": moveknight,
+    "/src/assets/wp.png": movepawn,
+    "/src/assets/bp.png": movepawn,
+    "/src/assets/wk.png": moveking,
+    "/src/assets/bk.png": moveking,
+  };
+
+  // Map board pieces to the respective kings they might check
+  const targetKings = {
+    "/src/assets/wq.png": "/src/assets/bk.png",
+    "/src/assets/wr.png": "/src/assets/bk.png",
+    "/src/assets/wb.png": "/src/assets/bk.png",
+    "/src/assets/wn.png": "/src/assets/bk.png",
+    "/src/assets/wp.png": "/src/assets/bk.png",
+    "/src/assets/wk.png": "/src/assets/bk.png",
+
+    "/src/assets/bq.png": "/src/assets/wk.png",
+    "/src/assets/br.png": "/src/assets/wk.png",
+    "/src/assets/bb.png": "/src/assets/wk.png",
+    "/src/assets/bn.png": "/src/assets/wk.png",
+    "/src/assets/bp.png": "/src/assets/wk.png",
+    "/src/assets/bk.png": "/src/assets/wk.png",
+  };
+
+  // Determine the appropriate move function and target king
+  const moveFunction = moveFunctions[boardpiece];
+  const targetKing = targetKings[boardpiece];
+  if (!moveFunction || !targetKing) {
+    console.warn("Invalid boardpiece or unsupported move function");
+    return;
+  }
+  let a = 10;
+  // Get possible moves for the current piece
+  const possibleMoves = moveFunction(row, col, boardpiece, a);
+
+  // Check if any of the moves threaten the target king
+  for (let i = 0; i < possibleMoves.length; i++) {
+    const targetIndex = possibleMoves[i];
+    if (board[targetIndex] === targetKing) {
+      console.log(
+        `${
+          targetKing === "/src/assets/bk.png" ? "Black" : "White"
+        } king is in check at index:`,
+        targetIndex
+      );
+      // Set the appropriate state for the king in check
+      if (targetKing === "/src/assets/bk.png") {
+        setBkingchecked("b");
+      } else {
+        setWkingchecked("w");
+      }
+      break;
+    }
+  }
+};

@@ -21,7 +21,6 @@ function App() {
   const [prevpos, setPrevpos] = useState(null);
   const [wkingchecked, setWkingchecked] = useState("");
   const [bkingchecked, setBkingchecked] = useState("");
-  const [iskingcheck, setIskingcheck] = useState("a");
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
   const whiteMajorPieces = [wr, wn, wb, wq, wk, wb, wn, wr];
@@ -43,8 +42,11 @@ function App() {
   //   if (x == y) return true;
   // };
 
-  const movepawn = (row, col, piece) => {
-    setPrevpos([row, col]);
+  const movepawn = (row, col, piece, a) => {
+    if (!a) {
+      setPrevpos([row, col]);
+      setBoardpiece(piece);
+    }
     const index = row * 8 + col;
     let move1 = null;
     let move2 = null;
@@ -52,8 +54,6 @@ function App() {
     let move4 = null;
     let side1 = null;
     let side2 = null;
-    setBoardpiece(piece);
-
     // Determine the possible moves
     if (piece.includes("wp")) {
       move1 = (row - 1) * 8 + col; // Single forward move for white pawn
@@ -107,21 +107,24 @@ function App() {
     }
     let moves = [move1, move2, move3, move4, side1, side2];
     // Update the board visually by toggling classes
-    document.querySelectorAll(".square").forEach((square, i) => {
-      square.classList.remove("selected", "mover");
-      if (i === index) {
-        square.classList.add("mover"); // Highlight current piece
-      } else if (i === move1 || i === move2 || i === move3 || i == move4) {
-        square.classList.add("selected"); // Highlight possible moves
-      }
-    });
+    if (!a) {
+      document.querySelectorAll(".square").forEach((square, i) => {
+        square.classList.remove("selected", "mover");
+        if (i === index) {
+          square.classList.add("mover"); // Highlight current piece
+        } else if (i === move1 || i === move2 || i === move3 || i == move4) {
+          square.classList.add("selected"); // Highlight possible moves
+        }
+      });
+    }
     return moves;
   };
 
-  const moverook = (row, col, piece) => {
-    const index = row * 8 + col;
-    setPrevpos([row, col]);
-    setBoardpiece(piece);
+  const moverook = (row, col, piece, a) => {
+    if (!a) {
+      setPrevpos([row, col]);
+      setBoardpiece(piece);
+    }
     const directions = [
       { dr: -1, dc: 0 }, // Up
       { dr: 1, dc: 0 }, // Down
@@ -157,23 +160,25 @@ function App() {
         moves.push(moveIndex);
       }
     });
-
-    // Highlight valid moves
-    document.querySelectorAll(".square").forEach((square, i) => {
-      square.classList.remove("selected", "mover");
-      if (i === row * 8 + col) {
-        square.classList.add("mover"); // Highlight current piece
-      } else if (moves.includes(i)) {
-        square.classList.add("selected"); // Highlight possible moves
-      }
-    });
+    if (!a) {
+      // Highlight valid moves
+      document.querySelectorAll(".square").forEach((square, i) => {
+        square.classList.remove("selected", "mover");
+        if (i === row * 8 + col) {
+          square.classList.add("mover"); // Highlight current piece
+        } else if (moves.includes(i)) {
+          square.classList.add("selected"); // Highlight possible moves
+        }
+      });
+    }
     return moves;
   };
 
-  const movebishop = (row, col, piece) => {
-    const index = row * 8 + col;
-    setPrevpos([row, col]);
-    setBoardpiece(piece);
+  const movebishop = (row, col, piece, a) => {
+    if (!a) {
+      setPrevpos([row, col]);
+      setBoardpiece(piece);
+    }
 
     const directions = [
       { dr: -1, dc: -1 }, // Up-Left
@@ -211,22 +216,25 @@ function App() {
       }
     });
 
-    // Highlight valid moves
-    document.querySelectorAll(".square").forEach((square, i) => {
-      square.classList.remove("selected", "mover");
-      if (i === row * 8 + col) {
-        square.classList.add("mover"); // Highlight current piece
-      } else if (moves.includes(i)) {
-        square.classList.add("selected"); // Highlight possible moves
-      }
-    });
+    if (!a) {
+      // Highlight valid moves
+      document.querySelectorAll(".square").forEach((square, i) => {
+        square.classList.remove("selected", "mover");
+        if (i === row * 8 + col) {
+          square.classList.add("mover"); // Highlight current piece
+        } else if (moves.includes(i)) {
+          square.classList.add("selected"); // Highlight possible moves
+        }
+      });
+    }
     return moves;
   };
 
-  const moveknight = (row, col, piece) => {
-    setPrevpos([row, col]);
-    setBoardpiece(piece);
-
+  const moveknight = (row, col, piece, a) => {
+    if (!a) {
+      setPrevpos([row, col]);
+      setBoardpiece(piece);
+    }
     const index = row * 8 + col;
     const knightMoves = [
       { dr: -1, dc: -2 },
@@ -267,24 +275,25 @@ function App() {
         }
       }
     });
-
-    // Update the board visually by toggling classes
-    document.querySelectorAll(".square").forEach((square, i) => {
-      square.classList.remove("selected", "mover");
-      if (i === index) {
-        square.classList.add("mover"); // Highlight current piece
-      } else if (moves.includes(i)) {
-        square.classList.add("selected"); // Highlight possible moves
-      }
-    });
+    if (!a) {
+      // Update the board visually by toggling classes
+      document.querySelectorAll(".square").forEach((square, i) => {
+        square.classList.remove("selected", "mover");
+        if (i === index) {
+          square.classList.add("mover"); // Highlight current piece
+        } else if (moves.includes(i)) {
+          square.classList.add("selected"); // Highlight possible moves
+        }
+      });
+    }
     return moves;
   };
 
-  const movequeen = (row, col, piece) => {
-    const index = row * 8 + col;
-    setPrevpos([row, col]);
-    setBoardpiece(piece);
-
+  const movequeen = (row, col, piece, a) => {
+    if (!a) {
+      setPrevpos([row, col]);
+      setBoardpiece(piece);
+    }
     // Define all directions for the queen (rook + bishop movements)
     const directions = [
       { dr: -1, dc: 0 }, // Up (rook)
@@ -327,22 +336,26 @@ function App() {
       }
     });
 
-    // Highlight valid moves
-    document.querySelectorAll(".square").forEach((square, i) => {
-      square.classList.remove("selected", "mover");
-      if (i === row * 8 + col) {
-        square.classList.add("mover"); // Highlight current piece
-      } else if (moves.includes(i)) {
-        square.classList.add("selected"); // Highlight possible moves
-      }
-    });
+    if (!a) {
+      // Highlight valid moves
+      document.querySelectorAll(".square").forEach((square, i) => {
+        square.classList.remove("selected", "mover");
+        if (i === row * 8 + col) {
+          square.classList.add("mover"); // Highlight current piece
+        } else if (moves.includes(i)) {
+          square.classList.add("selected"); // Highlight possible moves
+        }
+      });
+    }
     return moves;
   };
 
-  const moveking = (row, col, piece) => {
+  const moveking = (row, col, piece, a) => {
     const index = row * 8 + col;
-    setPrevpos([row, col]);
-    setBoardpiece(piece);
+    if (!a) {
+      setPrevpos([row, col]);
+      setBoardpiece(piece);
+    }
 
     const kingMoves = [
       { dr: -1, dc: 0 }, // Up
@@ -476,15 +489,16 @@ function App() {
         }
       }
     }
-
-    document.querySelectorAll(".square").forEach((square, i) => {
-      square.classList.remove("selected", "mover");
-      if (i === index) {
-        square.classList.add("mover"); // Highlight current piece
-      } else if (moves.includes(i)) {
-        square.classList.add("selected"); // Highlight possible moves
-      }
-    });
+    if (!a) {
+      document.querySelectorAll(".square").forEach((square, i) => {
+        square.classList.remove("selected", "mover");
+        if (i === index) {
+          square.classList.add("mover"); // Highlight current piece
+        } else if (moves.includes(i)) {
+          square.classList.add("selected"); // Highlight possible moves
+        }
+      });
+    }
     return moves;
   };
 
@@ -494,7 +508,74 @@ function App() {
     return square.classList.contains("selected"); // Check if it contains the 'selected' class
   };
 
-  const movepiece = (row, col, piece) => {
+  const checkassure2 = async () => {
+    // Map board pieces to their respective move functions
+    const moveFunctions = {
+      "/src/assets/wq.png": movequeen,
+      "/src/assets/bq.png": movequeen,
+      "/src/assets/wr.png": moverook,
+      "/src/assets/br.png": moverook,
+      "/src/assets/wb.png": movebishop,
+      "/src/assets/bb.png": movebishop,
+      "/src/assets/wn.png": moveknight,
+      "/src/assets/bn.png": moveknight,
+      "/src/assets/wp.png": movepawn,
+      "/src/assets/bp.png": movepawn,
+      "/src/assets/wk.png": moveking,
+      "/src/assets/bk.png": moveking,
+    };
+
+    // Map board pieces to the respective kings they might check
+    const targetKings = {
+      "/src/assets/wq.png": "/src/assets/bk.png",
+      "/src/assets/wr.png": "/src/assets/bk.png",
+      "/src/assets/wb.png": "/src/assets/bk.png",
+      "/src/assets/wn.png": "/src/assets/bk.png",
+      "/src/assets/wp.png": "/src/assets/bk.png",
+      "/src/assets/wk.png": "/src/assets/bk.png",
+
+      "/src/assets/bq.png": "/src/assets/wk.png",
+      "/src/assets/br.png": "/src/assets/wk.png",
+      "/src/assets/bb.png": "/src/assets/wk.png",
+      "/src/assets/bn.png": "/src/assets/wk.png",
+      "/src/assets/bp.png": "/src/assets/wk.png",
+      "/src/assets/bk.png": "/src/assets/wk.png",
+    };
+
+    for (let i = 0; i < board.length; i++) {
+      const boardpiece = board[i];
+      if (boardpiece) {
+        const row = Math.floor(i / 8);
+        const col = i % 8;
+        // Determine the appropriate move function and target king
+        const moveFunction = moveFunctions[boardpiece];
+        const targetKing = targetKings[boardpiece];
+
+        console.log(targetKing);
+        let a = 10;
+        // Get possible moves for the current piece
+        const possibleMoves = moveFunction(row, col, boardpiece, a);
+        // Check if any of the moves threaten the target king
+        for (let i = 0; i < possibleMoves.length; i++) {
+          const targetIndex = possibleMoves[i];
+          if (board[targetIndex] === targetKing) {
+            console.log(
+              `The ${targetKing} is being targeted at ${targetIndex}`
+            );
+            // Set the appropriate state for the king in check
+            if (targetKing === "/src/assets/bk.png") {
+              setBkingchecked("b");
+            } else if (targetKing === "/src/assets/wk.png") {
+              setWkingchecked("w");
+            }
+          } else {
+          }
+        }
+      }
+    }
+  };
+
+  const movepiece = async (row, col, piece) => {
     console.log("Attempting to move piece...");
     // Check if the move is valid
     if (!selectcheck(row, col)) {
@@ -542,7 +623,6 @@ function App() {
 
     // Update the board state
     setBoard(updatedBoard);
-
     // Clear piececontroller and boardpiece states
     setPiececontroller(false);
     setBoardpiece(null);
@@ -552,14 +632,16 @@ function App() {
       square.classList.remove("selected", "mover");
     });
     console.log("Piece moved successfully!");
-    // Toggle the turn
+
     setTurn(turn === "w" ? "b" : "w");
   };
   const showpath = async (row, col, piece) => {
     let j;
+    await checkassure2();
     try {
       if (piece) {
         j = piece.split("/").pop().split(".")[0][0];
+        console.log("xx");
 
         if (j !== turn && piececontroller == false) {
           return;
@@ -568,7 +650,9 @@ function App() {
       if (piece == null && piececontroller == false) return;
       if (piece == null && piececontroller == true) {
         movepiece(row, col, piece);
+        console.log("x1");
       } else if (piececontroller == true && j !== turn) {
+        console.log("x2");
         movepiece(row, col, piece);
       } else {
         if (piece.includes("wp") || piece.includes("bp")) {
