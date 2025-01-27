@@ -30,8 +30,8 @@ function App() {
   // Set black and white pieces dynamically
   blackMajorPieces.forEach((piece, i) => {
     initialBoard[i] = piece; // Black pieces (row 0)
-    initialBoard[8 + i] = bp; // Black pawns (row 1)
-    initialBoard[48 + i] = wp; // White pawns (row 6)
+    // initialBoard[8 + i] = bp; // Black pawns (row 1)
+    // initialBoard[48 + i] = wp; // White pawns (row 6)
     initialBoard[56 + i] = whiteMajorPieces[i]; // White pieces (row 7)
   });
 
@@ -119,11 +119,106 @@ function App() {
   const moverook = (row, col, piece) => {
     console.log(row, col, piece, "rook");
     const index = row * 8 + col;
+    setPrevpos([row, col]);
+    setBoardpiece(piece);
+    const directions = [
+      { dr: -1, dc: 0 }, // Up
+      { dr: 1, dc: 0 }, // Down
+      { dr: 0, dc: -1 }, // Left
+      { dr: 0, dc: 1 }, // Right
+    ];
+
+    let moves = [];
+
+    directions.forEach(({ dr, dc }) => {
+      for (let i = 1; i < 8; i++) {
+        const newRow = row + dr * i;
+        const newCol = col + dc * i;
+
+        // Check if the move is out of bounds
+        if (newRow < 0 || newRow >= 8 || newCol < 0 || newCol >= 8) break;
+
+        const moveIndex = newRow * 8 + newCol;
+
+        // If the square is occupied
+        if (board[moveIndex]) {
+          const j = board[moveIndex].split("/").pop().split(".")[0][0];
+
+          // Stop if the piece is the same color as the current turn
+          if (j === turn) break;
+
+          // Add the square as a valid move (capture opponent piece)
+          moves.push(moveIndex);
+          break; // Stop further movement in this direction
+        }
+
+        // Add the square as a valid move
+        moves.push(moveIndex);
+      }
+    });
+
+    // Highlight valid moves
+    document.querySelectorAll(".square").forEach((square, i) => {
+      square.classList.remove("selected", "mover");
+      if (i === row * 8 + col) {
+        square.classList.add("mover"); // Highlight current piece
+      } else if (moves.includes(i)) {
+        square.classList.add("selected"); // Highlight possible moves
+      }
+    });
   };
 
   const movebishop = (row, col, piece) => {
     console.log(row, col, piece, "bishop");
     const index = row * 8 + col;
+    setPrevpos([row, col]);
+    setBoardpiece(piece);
+
+    const directions = [
+      { dr: -1, dc: -1 }, // Up-Left
+      { dr: -1, dc: 1 }, // Up-Right
+      { dr: 1, dc: -1 }, // Down-Left
+      { dr: 1, dc: 1 }, // Down-Right
+    ];
+
+    let moves = [];
+
+    directions.forEach(({ dr, dc }) => {
+      for (let i = 1; i < 8; i++) {
+        const newRow = row + dr * i;
+        const newCol = col + dc * i;
+
+        // Check if the move is out of bounds
+        if (newRow < 0 || newRow >= 8 || newCol < 0 || newCol >= 8) break;
+
+        const moveIndex = newRow * 8 + newCol;
+
+        // If the square is occupied
+        if (board[moveIndex]) {
+          const j = board[moveIndex].split("/").pop().split(".")[0][0];
+
+          // Stop if the piece is the same color as the current turn
+          if (j === turn) break;
+
+          // Add the square as a valid move (capture opponent piece)
+          moves.push(moveIndex);
+          break; // Stop further movement in this direction
+        }
+
+        // Add the square as a valid move
+        moves.push(moveIndex);
+      }
+    });
+
+    // Highlight valid moves
+    document.querySelectorAll(".square").forEach((square, i) => {
+      square.classList.remove("selected", "mover");
+      if (i === row * 8 + col) {
+        square.classList.add("mover"); // Highlight current piece
+      } else if (moves.includes(i)) {
+        square.classList.add("selected"); // Highlight possible moves
+      }
+    });
   };
 
   const moveknight = (row, col, piece) => {
@@ -271,25 +366,6 @@ function App() {
       dr = (row - 1) * 8 + (col + 1);
     }
     const j = piece.split("/").pop().split(".")[0][0];
-    // const movecheck = (a) => {
-    //   if (board[a]) {
-    //     const jx = board[a].split("/").pop().split(".")[0][0];
-    //     let temp = a;
-    //     a = null;
-    //     if (j !== jx) a = temp;
-    //     return a;
-    //   } else {
-    //     return null;
-    //   }
-    // };
-    // move1 = movecheck(move1);
-    // move2 = movecheck(move2);
-    // move3 = movecheck(move3);
-    // move4 = movecheck(move4);
-    // ul = movecheck(ul);
-    // ur = movecheck(ur);
-    // dl = movecheck(dl);
-    // dr = movecheck(dr);
 
     if (board[move1]) {
       const j1 = board[move1].split("/").pop().split(".")[0][0];
@@ -425,15 +501,19 @@ function App() {
           setPiececontroller(true);
         } else if (piece.includes("wr") || piece.includes("br")) {
           moverook(row, col, piece);
+          setPiececontroller(true);
         } else if (piece.includes("wb") || piece.includes("bb")) {
           movebishop(row, col, piece);
+          setPiececontroller(true);
         } else if (piece.includes("wn") || piece.includes("bn")) {
           moveknight(row, col, piece);
           setPiececontroller(true);
         } else if (piece.includes("wq") || piece.includes("bq")) {
           movequeen(row, col, piece);
+          setPiececontroller(true);
         } else if (piece.includes("wk") || piece.includes("bk")) {
           moveking(row, col, piece);
+          setPiececontroller(true);
         }
       }
     } catch (e) {
