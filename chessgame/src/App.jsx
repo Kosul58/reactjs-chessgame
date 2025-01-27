@@ -699,6 +699,10 @@ function App() {
   };
 
   const checkassure = (row, col, boardpiece) => {
+    // for (let i = 0; i <= board.length; i++) {
+    //   console.log(board[i]);
+    // }
+
     // Get all possible moves for the queen
     const possibleMoves = movequeen(row, col, boardpiece);
     // Check for white queen attacking the black king
@@ -894,9 +898,11 @@ function App() {
 
     // Update the board state
     setBoard(updatedBoard);
+
     if (boardpiece) {
       checkassure(row, col, boardpiece);
     }
+
     // Clear piececontroller and boardpiece states
     setPiececontroller(false);
     setBoardpiece(null);
@@ -912,6 +918,7 @@ function App() {
 
   const showpath = async (row, col, piece) => {
     let j;
+    // checkassure();
     try {
       if (piece) {
         j = piece.split("/").pop().split(".")[0][0];
