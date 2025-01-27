@@ -328,6 +328,60 @@ function App() {
   const movequeen = (row, col, piece) => {
     console.log(row, col, piece, "queen");
     const index = row * 8 + col;
+    setPrevpos([row, col]);
+    setBoardpiece(piece);
+
+    // Define all directions for the queen (rook + bishop movements)
+    const directions = [
+      { dr: -1, dc: 0 }, // Up (rook)
+      { dr: 1, dc: 0 }, // Down (rook)
+      { dr: 0, dc: -1 }, // Left (rook)
+      { dr: 0, dc: 1 }, // Right (rook)
+      { dr: -1, dc: -1 }, // Up-Left (bishop)
+      { dr: -1, dc: 1 }, // Up-Right (bishop)
+      { dr: 1, dc: -1 }, // Down-Left (bishop)
+      { dr: 1, dc: 1 }, // Down-Right (bishop)
+    ];
+
+    let moves = [];
+
+    // Iterate through each direction
+    directions.forEach(({ dr, dc }) => {
+      for (let i = 1; i < 8; i++) {
+        const newRow = row + dr * i;
+        const newCol = col + dc * i;
+
+        // Check if the move is out of bounds
+        if (newRow < 0 || newRow >= 8 || newCol < 0 || newCol >= 8) break;
+
+        const moveIndex = newRow * 8 + newCol;
+
+        // If the square is occupied
+        if (board[moveIndex]) {
+          const j = board[moveIndex].split("/").pop().split(".")[0][0];
+
+          // Stop if the piece is the same color as the current turn
+          if (j === turn) break;
+
+          // Add the square as a valid move (capture opponent piece)
+          moves.push(moveIndex);
+          break; // Stop further movement in this direction
+        }
+
+        // Add the square as a valid move
+        moves.push(moveIndex);
+      }
+    });
+
+    // Highlight valid moves
+    document.querySelectorAll(".square").forEach((square, i) => {
+      square.classList.remove("selected", "mover");
+      if (i === row * 8 + col) {
+        square.classList.add("mover"); // Highlight current piece
+      } else if (moves.includes(i)) {
+        square.classList.add("selected"); // Highlight possible moves
+      }
+    });
   };
 
   const moveking = (row, col, piece) => {
