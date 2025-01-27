@@ -593,7 +593,6 @@ function App() {
     });
 
     if (!kingchecked) {
-      let move1, move2;
       if (row == 0 || row == 7) {
         if (piece.includes("bk")) {
           let kl1 = row * 8 + (col - 1);
