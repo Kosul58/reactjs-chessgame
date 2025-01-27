@@ -20,6 +20,7 @@ function App() {
   let [piececontroller, setPiececontroller] = useState(false);
   const [prevpos, setPrevpos] = useState(null);
   const [kingchecked, setKingchecked] = useState(null);
+  const [rookpos, setRookpos] = useState(null);
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
   const whiteMajorPieces = [wr, wn, wb, wq, wk, wb, wn, wr];
@@ -591,6 +592,56 @@ function App() {
       }
     });
 
+    if (!kingchecked) {
+      let move1, move2;
+      if (row == 0 || row == 7) {
+        if (piece.includes("bk")) {
+          let kl1 = row * 8 + (col - 1);
+          let kl2 = row * 8 + (col - 2);
+          let kl3 = row * 8 + (col - 3);
+          let kr1 = row * 8 + (col + 1);
+          let kr2 = row * 8 + (col + 2);
+          let kr3 = row * 8 + (col + 3);
+          if (board[kl1] && board[kl2]) {
+            move1 = null;
+          } else {
+            if (board[kl3] == "/src/assets/br.png") {
+              move1 = row * 8 + (col - 2);
+            }
+          }
+          if (board[kr1] && board[kr2]) {
+            move2 = null;
+          } else {
+            if (board[kr3] == "/src/assets/br.png") {
+              move2 = row * 8 + (col + 2);
+            }
+          }
+        } else if (piece.includes("wk")) {
+          let kl1 = row * 8 + (col - 1);
+          let kl2 = row * 8 + (col - 2);
+          let kl3 = row * 8 + (col - 3);
+          let kr1 = row * 8 + (col + 1);
+          let kr2 = row * 8 + (col + 2);
+          let kr3 = row * 8 + (col + 3);
+          if (!board[kl1] && !board[kl2]) {
+            if (board[kl3] == "/src/assets/wr.png") {
+              move1 = row * 8 + (col - 2);
+            }
+          } else {
+            move1 = null;
+          }
+          if (!board[kr1] && !board[kr2]) {
+            if (board[kr3] == "/src/assets/wr.png") {
+              move2 = row * 8 + (col + 2);
+            }
+          } else {
+            move2 = null;
+          }
+        }
+        moves.push(move1);
+        moves.push(move2);
+      }
+    }
     // Update the board visually by toggling classes
     document.querySelectorAll(".square").forEach((square, i) => {
       square.classList.remove("selected", "mover");
