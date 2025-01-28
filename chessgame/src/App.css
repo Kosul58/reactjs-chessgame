@@ -54,7 +54,23 @@ body {
   backdrop-filter: blur(10px);
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.gamecontrol button {
+  width: 150px;
+  height: 50px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(141, 207, 225, 0.6);
+}
+
+.gamecontrol button:hover {
+  scale: 1.2;
+  background-color: red;
+  color: white;
 }
 
 .row {

@@ -17,11 +17,11 @@ function App() {
   const [boardpiece, setBoardpiece] = useState([]);
   const [turn, setTurn] = useState("w"); //white turn first
   let [piececontroller, setPiececontroller] = useState(false);
+  const [prespos, setPrespos] = useState([]);
   const [prevpos, setPrevpos] = useState(null);
   const [wkingchecked, setWkingchecked] = useState("");
   const [bkingchecked, setBkingchecked] = useState("");
-  const bkingmoverestrict = new Set();
-  const wkingmoverestrict = new Set();
+  let [backupdata, setBackupdata] = useState([]);
 
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
@@ -33,8 +33,8 @@ function App() {
   // Set black and white pieces dynamically
   blackMajorPieces.forEach((piece, i) => {
     initialBoard[i] = piece; // Black pieces (row 0)
-    // initialBoard[8 + i] = bp; // Black pawns (row 1)
-    // initialBoard[48 + i] = wp; // White pawns (row 6)
+    initialBoard[8 + i] = bp; // Black pawns (row 1)
+    initialBoard[48 + i] = wp; // White pawns (row 6)
     initialBoard[56 + i] = whiteMajorPieces[i]; // White pieces (row 7)
   });
 
@@ -55,7 +55,7 @@ function App() {
       move1 = (row - 1) * 8 + col; // Single forward move for white pawn
       if (row === 6) move2 = (row - 2) * 8 + col; // Double forward move for white pawn
 
-      if (col < 7) side2 = (row - 1) * 8 + (col + 1);
+      if (col < 8) side2 = (row - 1) * 8 + (col + 1);
       if (col != 0) {
         side1 = (row - 1) * 8 + (col - 1);
       } else {
@@ -79,17 +79,17 @@ function App() {
       move1 = null;
       move2 = null;
     }
+
     if (board[side1] && board[side2]) {
       if (piece !== board[side1] && piece !== board[side2]) {
-        move3 = move1;
-        move1 = side1;
-        move4 = move2;
-        move2 = side2;
+        move2 = side1;
+        move3 = side2;
       }
     }
     if (board[side1]) {
       const j = board[side1].includes(turn);
       if (piece !== board[side1] && j === false) {
+        move3 = move2;
         move2 = move1;
         move1 = side1;
       }
@@ -97,6 +97,7 @@ function App() {
     if (board[side2]) {
       const j = board[side2].includes(turn);
       if (piece !== board[side2] && j === false) {
+        move3 = move2;
         move2 = move1;
         move1 = side2;
       }
@@ -638,17 +639,62 @@ function App() {
       console.log("Invalid move: The square is not selected.");
       return;
     }
-
     console.log("Valid move detected.");
     // Indices for the target and previous squares
     const targetIndex = row * 8 + col;
     const [prevRow, prevCol] = prevpos;
     const prevIndex = prevRow * 8 + prevCol;
-
+    const targetpiece = board[targetIndex];
+    setPrespos((prevdata) => [...prevdata, [row, col, targetpiece]]);
     // Create a copy of the board
     const updatedBoard = [...board];
+    let pawnchange;
+
+    if (row == 0 && boardpiece == "/src/assets/wp.png") {
+      const j = prompt("Which one do you want? Queen, Rook, Knight, Bishop");
+      switch (j.toLowerCase()) {
+        case "queen":
+          pawnchange = "/src/assets/wq.png";
+          break;
+        case "rook":
+          pawnchange = "/src/assets/wr.png";
+          break;
+        case "knight":
+          pawnchange = "/src/assets/wn.png";
+          break;
+        case "bishop":
+          pawnchange = "/src/assets/wb.png";
+          break;
+        default:
+          alert("Invalid choice! Defaulting to Queen.");
+          pawnchange = "/src/assets/wq.png";
+      }
+    } else if (row == 7 && boardpiece == "/src/assets/bp.png") {
+      const j = prompt("Which one do you want? Queen, Rook, Knight, Bishop");
+      switch (j.toLowerCase()) {
+        case "queen":
+          pawnchange = "/src/assets/bq.png";
+          break;
+        case "rook":
+          pawnchange = "/src/assets/br.png";
+          break;
+        case "knight":
+          pawnchange = "/src/assets/bn.png";
+          break;
+        case "bishop":
+          pawnchange = "/src/assets/bb.png";
+          break;
+        default:
+          alert("Invalid choice! Defaulting to Queen.");
+          pawnchange = "/src/assets/bq.png";
+      }
+    }
+
+    setBackupdata((prevData) => [...prevData, [prevRow, prevCol, boardpiece]]);
+
     // Move the piece
-    updatedBoard[targetIndex] = boardpiece;
+    const movedpiece = pawnchange || boardpiece;
+    updatedBoard[targetIndex] = movedpiece;
     updatedBoard[prevIndex] = null;
 
     // Handle castling logic for the king
@@ -675,11 +721,12 @@ function App() {
           : "/src/assets/br.png"; // Place the rook in its new position
       }
     }
+
     // Update the board state
     setBoard(updatedBoard);
 
     if (boardpiece) {
-      checkassurex(row, col, boardpiece);
+      checkassurex(row, col, movedpiece);
     }
     // Clear piececontroller and boardpiece states
     setPiececontroller(false);
@@ -740,6 +787,28 @@ function App() {
     }
   };
 
+  const undo = () => {
+    console.log(backupdata);
+    if (backupdata.length === 0) {
+      alert("No moves to undo!");
+      return;
+    }
+
+    // Pop the last move from backupdata
+
+    const updatedBoard = [...board];
+    const present = prespos.pop();
+    const [presr, presc, presp] = present;
+    const pres = presr * 8 + presc;
+    updatedBoard[pres] = presp;
+    const lastMove = backupdata.pop();
+    const [row, col, movedPiece] = lastMove;
+    const target = row * 8 + col;
+    updatedBoard[target] = movedPiece;
+    setBoard(updatedBoard);
+    setTurn(turn === "w" ? "b" : "w");
+  };
+
   const [board, setBoard] = useState(initialBoard); // State to track the board
 
   useEffect(() => {
@@ -776,7 +845,15 @@ function App() {
           </div>
         ))}
       </div>
-      <div className="gamecontrol"></div>
+      <div className="gamecontrol">
+        <button
+          onClick={() => {
+            undo();
+          }}
+        >
+          Undo
+        </button>
+      </div>
     </div>
   );
 }
