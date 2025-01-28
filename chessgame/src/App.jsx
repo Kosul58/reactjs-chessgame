@@ -632,7 +632,7 @@ function App() {
     return { movesw, movesb };
   };
 
-  const movepiece = async (row, col, piece) => {
+  const movepiece = async (row, col) => {
     console.log("Attempting to move piece...");
     // Check if the move is valid
     if (!selectcheck(row, col)) {
