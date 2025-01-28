@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import "./App.css";
 import bk from "./assets/bk.png";
 import bb from "./assets/bb.png";
@@ -20,8 +20,8 @@ function App() {
   const [prevpos, setPrevpos] = useState(null);
   const [wkingchecked, setWkingchecked] = useState("");
   const [bkingchecked, setBkingchecked] = useState("");
-  const bkingmoverestrict = new Set();
-  const wkingmoverestrict = new Set();
+  const bkingmoverestrict = [];
+  const wkingmoverestrict = [];
 
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
@@ -345,7 +345,7 @@ function App() {
     return moves;
   };
 
-  const moveking = async (row, col, piece, a) => {
+  const moveking = (row, col, piece, a) => {
     const index = row * 8 + col;
     if (!a) {
       setPrevpos([row, col]);
@@ -363,7 +363,7 @@ function App() {
       { dr: 1, dc: 1 }, // Down-Right
     ];
 
-    let moves = [];
+    const moves = [];
     const currentColor = piece.split("/").pop().split(".")[0][0];
 
     kingMoves.forEach(({ dr, dc }) => {
@@ -433,17 +433,6 @@ function App() {
         }
       }
     }
-
-    if (!a) {
-      const { movesw, movesb } = await checkassure2();
-      console.log(movesw, movesb);
-      if (turn === "w") {
-        moves = moves.filter((k) => !movesb.has(k)); // Remove moves that are in movesb
-      } else if (turn === "b") {
-        moves = moves.filter((k) => !movesw.has(k)); // Remove moves that are in movesw
-      }
-    }
-
     if (!a) {
       document.querySelectorAll(".square").forEach((square, i) => {
         square.classList.remove("selected", "mover");
@@ -513,12 +502,12 @@ function App() {
     for (let i = 0; i < possibleMoves.length; i++) {
       const targetIndex = possibleMoves[i];
       if (board[targetIndex] === targetKing) {
-        // document.querySelectorAll(".square").forEach((square, i) => {
-        //   square.classList.remove("check");
-        //   if (i == targetIndex) {
-        //     square.classList.add("check");
-        //   }
-        // });
+        document.querySelectorAll(".square").forEach((square, i) => {
+          // square.classList.remove("check");
+          if (i == targetIndex) {
+            square.classList.add("check");
+          }
+        });
         console.log(
           `${
             targetKing === "/src/assets/bk.png" ? "Black" : "White"
@@ -553,8 +542,7 @@ function App() {
       "/src/assets/wk.png": moveking,
       "/src/assets/bk.png": moveking,
     };
-    const movesw = new Set();
-    const movesb = new Set();
+
     // Map board pieces to the respective kings they might check
     const targetKings = {
       "/src/assets/wq.png": "/src/assets/bk.png",
@@ -571,40 +559,27 @@ function App() {
       "/src/assets/bp.png": "/src/assets/wk.png",
       "/src/assets/bk.png": "/src/assets/wk.png",
     };
-    let wkingpos, bkingpos;
-    let totalmoves = [];
+    const moves = [];
     for (let i = 0; i < board.length; i++) {
       const boardpiece = board[i];
       if (boardpiece) {
         const row = Math.floor(i / 8);
         const col = i % 8;
-        if (board[i] == "/src/assets/bk.png") {
-          bkingpos = i;
-        } else if (board[i] == "/src/assets/wk.png") {
-          wkingpos = i;
-        }
         const moveFunction = moveFunctions[boardpiece];
         const targetKing = targetKings[boardpiece];
         // Get possible moves for the current piece
-        const possibleMoves = moveFunction(row, col, boardpiece, 10) || [];
-        if (Array.isArray(possibleMoves)) {
-          totalmoves.push(...possibleMoves);
-        }
+        const possibleMoves = moveFunction(row, col, boardpiece, 10);
         // Check if any of the moves threaten the target king
         for (let i = 0; i < possibleMoves.length; i++) {
           const targetIndex = possibleMoves[i];
-          if (targetKing == "/src/assets/bk.png") {
-            movesw.add(targetIndex);
-          } else if (targetKing == "/src/assets/wk.png") {
-            movesb.add(targetIndex);
-          }
           if (board[targetIndex] === targetKing) {
-            // document.querySelectorAll(".square").forEach((square, i) => {
-            //   square.classList.remove("check");
-            //   if (i == targetIndex) {
-            //     square.classList.add("check");
-            //   }
-            // });
+            moves.push(targetIndex);
+            document.querySelectorAll(".square").forEach((square, i) => {
+              // square.classList.remove("check");
+              if (i == targetIndex) {
+                square.classList.add("check");
+              }
+            });
             console.log(
               `The ${targetKing} is being targeted at ${targetIndex} by ${boardpiece} at ${row} ,${col}`
             );
@@ -620,15 +595,12 @@ function App() {
             }
           }
         }
+
+        for (let i = 0; i < moves.length; i++) {
+          console.log(moves[i]);
+        }
       }
     }
-    // console.log(bkingpos, wkingpos, movesb, movesw);
-    // if (movesb.has(wkingpos)) {
-    //   console.log("save wking");
-    // } else if (movesw.has(bkingpos)) {
-    //   console.log("save bking");
-    // }
-    return { movesw, movesb };
   };
 
   const movepiece = async (row, col, piece) => {
@@ -746,36 +718,34 @@ function App() {
     checkassure2();
   }, [board]);
 
+  const renderBoard = useMemo(() => {
+    return [...Array(8)].map((_, rowIndex) => (
+      <div className="row" key={rowIndex}>
+        {[...Array(8)].map((_, colIndex) => {
+          const index = rowIndex * 8 + colIndex;
+          return (
+            <div
+              key={colIndex}
+              className="square"
+              style={{
+                backgroundColor:
+                  (rowIndex + colIndex) % 2 === 0 ? "white" : "black",
+                backgroundImage: board[index] ? `url(${board[index]})` : "none",
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              }}
+              onClick={() => showpath(rowIndex, colIndex, board[index])}
+            ></div>
+          );
+        })}
+      </div>
+    ));
+  }, [board, showpath]);
+
   return (
     <div className="chessgame">
-      <div className="gameplay">
-        {[...Array(8)].map((_, rowIndex) => (
-          <div className="row" key={rowIndex}>
-            {[...Array(8)].map((_, colIndex) => {
-              const index = rowIndex * 8 + colIndex; // Calculate the index
-              return (
-                <div
-                  key={colIndex}
-                  className="square"
-                  style={{
-                    backgroundColor:
-                      (rowIndex + colIndex) % 2 === 0 ? "white" : "black",
-                    backgroundImage: board[index]
-                      ? `url(${board[index]})`
-                      : "none",
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
-                  }}
-                  onClick={() => {
-                    showpath(rowIndex, colIndex, board[index]);
-                  }}
-                ></div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
+      <div className="gameplay">{renderBoard}</div>
       <div className="gamecontrol"></div>
     </div>
   );
