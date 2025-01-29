@@ -22,6 +22,9 @@ function App() {
   const [wkingchecked, setWkingchecked] = useState("");
   const [bkingchecked, setBkingchecked] = useState("");
   let [backupdata, setBackupdata] = useState([]);
+  let [missingpieces, setMissingpieces] = useState([]);
+  let [mwhitepiece, setMwhite] = useState([]);
+  let [mblackpiece, setMblack] = useState([]);
 
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
@@ -640,6 +643,10 @@ function App() {
     const [prevRow, prevCol] = prevpos;
     const prevIndex = prevRow * 8 + prevCol;
     const targetpiece = board[targetIndex];
+    if (targetpiece) {
+      console.log("piece transfered successfully");
+      setMissingpieces((predata) => [...predata, targetpiece]);
+    }
     setPrespos((prevdata) => [...prevdata, [row, col, targetpiece]]);
     // Create a copy of the board
     const updatedBoard = [...board];
@@ -703,7 +710,6 @@ function App() {
         right: { rookIndex: 7, rookTarget: 5 },
       },
     };
-
     if (castlingMoves[boardpiece]) {
       const moveDirection =
         prevCol - col > 1 ? "left" : col - prevCol > 1 ? "right" : null;
@@ -800,10 +806,29 @@ function App() {
     setTurn(turn === "w" ? "b" : "w");
   };
 
+  const checkmissingpieces = () => {
+    let white = [];
+    let black = [];
+
+    for (let i = 0; i < missingpieces.length; i++) {
+      const piece = missingpieces[i];
+      console.log(piece);
+      if (piece.includes("w")) {
+        white.push(piece);
+      } else {
+        black.push(piece);
+      }
+    }
+
+    setMwhite(white);
+    setMblack(black);
+  };
+
   const [board, setBoard] = useState(initialBoard); // State to track the board
 
   useEffect(() => {
     checkassure2();
+    checkmissingpieces();
   }, [board]);
 
   return (
@@ -837,6 +862,17 @@ function App() {
         ))}
       </div>
       <div className="gamecontrol">
+        <div className="whitepieces">
+          <h1>Whitepieces</h1>
+          {mwhitepiece.map((piece, index) => (
+            <img
+              key={index}
+              src={piece}
+              alt="Black Missing Piece"
+              className="piece"
+            />
+          ))}
+        </div>
         <button
           onClick={() => {
             undo();
@@ -844,6 +880,17 @@ function App() {
         >
           Undo
         </button>
+        <div className="blackpieces">
+          <h1>Blackpieces</h1>
+          {mblackpiece.map((piece, index) => (
+            <img
+              key={index}
+              src={piece}
+              alt="Black Missing Piece"
+              className="piece"
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
