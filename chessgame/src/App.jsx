@@ -572,18 +572,13 @@ function App() {
       "/src/assets/bp.png": "/src/assets/wk.png",
       "/src/assets/bk.png": "/src/assets/wk.png",
     };
-    let wkingpos, bkingpos;
     let totalmoves = [];
     for (let i = 0; i < board.length; i++) {
       const boardpiece = board[i];
       if (boardpiece) {
         const row = Math.floor(i / 8);
         const col = i % 8;
-        if (board[i] == "/src/assets/bk.png") {
-          bkingpos = i;
-        } else if (board[i] == "/src/assets/wk.png") {
-          wkingpos = i;
-        }
+
         const moveFunction = moveFunctions[boardpiece];
         const targetKing = targetKings[boardpiece];
         // Get possible moves for the current piece
@@ -776,14 +771,10 @@ function App() {
         } else if (piece.includes("wq") || piece.includes("bq")) {
           movequeen(row, col, piece);
           setPiececontroller(true);
-        } else if (piece.includes("wk") || piece.includes("bk")) {
-          moveking(row, col, piece);
-          setPiececontroller(true);
         }
       }
     } catch (e) {
       console.log(e);
-    } finally {
     }
   };
 
