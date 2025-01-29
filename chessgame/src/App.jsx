@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import bk from "./assets/bk.png";
 import bb from "./assets/bb.png";
@@ -804,7 +804,7 @@ function App() {
 
   useEffect(() => {
     checkassure2();
-  }, [board]);
+  }, [board, checkassure2]);
 
   return (
     <div className="chessgame">
