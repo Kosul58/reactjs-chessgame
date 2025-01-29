@@ -804,7 +804,7 @@ function App() {
 
   useEffect(() => {
     checkassure2();
-  }, [board, checkassure2]);
+  }, [board]);
 
   return (
     <div className="chessgame">
