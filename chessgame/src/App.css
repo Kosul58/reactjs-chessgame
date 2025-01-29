@@ -125,8 +125,13 @@ body {
   justify-content: center;
   flex-wrap: wrap;
   gap: 2px;
+  flex-direction: column;
 }
 .piece {
   width: 50px;
   height: 50px;
+}
+
+.piece h1 {
+  font-size: 50px;
 }

@@ -863,15 +863,17 @@ function App() {
       </div>
       <div className="gamecontrol">
         <div className="whitepieces">
-          <h1>Whitepieces</h1>
-          {mwhitepiece.map((piece, index) => (
-            <img
-              key={index}
-              src={piece}
-              alt="Black Missing Piece"
-              className="piece"
-            />
-          ))}
+          <p>Whitepieces</p>
+          <div>
+            {mwhitepiece.map((piece, index) => (
+              <img
+                key={index}
+                src={piece}
+                alt="Black Missing Piece"
+                className="piece"
+              />
+            ))}
+          </div>
         </div>
         <button
           onClick={() => {
@@ -881,15 +883,18 @@ function App() {
           Undo
         </button>
         <div className="blackpieces">
-          <h1>Blackpieces</h1>
-          {mblackpiece.map((piece, index) => (
-            <img
-              key={index}
-              src={piece}
-              alt="Black Missing Piece"
-              className="piece"
-            />
-          ))}
+          <p>Blackpieces</p>
+          <div>
+            {" "}
+            {mblackpiece.map((piece, index) => (
+              <img
+                key={index}
+                src={piece}
+                alt="Black Missing Piece"
+                className="piece"
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
