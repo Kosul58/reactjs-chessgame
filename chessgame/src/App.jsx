@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./App.css";
 import bk from "./assets/bk.png";
 import bb from "./assets/bb.png";
@@ -14,6 +14,8 @@ import wq from "./assets/wq.png";
 import wp from "./assets/wp.png";
 
 function App() {
+  const game = useRef(null);
+  const startbtn = useRef(null);
   const [boardpiece, setBoardpiece] = useState([]);
   const [turn, setTurn] = useState("w"); //white turn first
   let [piececontroller, setPiececontroller] = useState(false);
@@ -824,6 +826,11 @@ function App() {
     setMblack(black);
   };
 
+  const startgame = () => {
+    startbtn.current.classList.add("displaynone");
+    game.current.classList.remove("displaynone");
+  };
+
   const [board, setBoard] = useState(initialBoard); // State to track the board
 
   useEffect(() => {
@@ -832,72 +839,98 @@ function App() {
   }, [board]);
 
   return (
-    <div className="chessgame">
-      <div className="gameplay">
-        {[...Array(8)].map((_, rowIndex) => (
-          <div className="row" key={rowIndex}>
-            {[...Array(8)].map((_, colIndex) => {
-              const index = rowIndex * 8 + colIndex; // Calculate the index
-              return (
-                <div
-                  key={colIndex}
-                  className="square"
-                  style={{
-                    backgroundColor:
-                      (rowIndex + colIndex) % 2 === 0 ? "white" : "black",
-                    backgroundImage: board[index]
-                      ? `url(${board[index]})`
-                      : "none",
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
-                  }}
-                  onClick={() => {
-                    showpath(rowIndex, colIndex, board[index]);
-                  }}
-                ></div>
-              );
-            })}
+    <>
+      <button
+        onClick={() => {
+          startgame();
+        }}
+        ref={startbtn}
+        className="starter"
+      >
+        Start Game
+      </button>
+      <div className="chessgame displaynone" ref={game}>
+        <div className="gameplay">
+          {[...Array(8)].map((_, rowIndex) => (
+            <div className="row" key={rowIndex}>
+              {[...Array(8)].map((_, colIndex) => {
+                const index = rowIndex * 8 + colIndex; // Calculate the index
+                return (
+                  <div
+                    key={colIndex}
+                    className="square"
+                    style={{
+                      backgroundColor:
+                        (rowIndex + colIndex) % 2 === 0 ? "white" : "black",
+                      backgroundImage: board[index]
+                        ? `url(${board[index]})`
+                        : "none",
+                      backgroundSize: "contain",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
+                    }}
+                    onClick={() => {
+                      showpath(rowIndex, colIndex, board[index]);
+                    }}
+                  ></div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div className="gamecontrol">
+          <div
+            style={{
+              height: "50px",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "10px",
+            }}
+          >
+            <p>Turn: </p>
+            <span
+              style={{ backgroundColor: turn == "w" ? "white" : "black" }}
+            ></span>
           </div>
-        ))}
-      </div>
-      <div className="gamecontrol">
-        <div className="whitepieces">
-          <p>Whitepieces</p>
-          <div>
-            {mwhitepiece.map((piece, index) => (
-              <img
-                key={index}
-                src={piece}
-                alt="Black Missing Piece"
-                className="piece"
-              />
-            ))}
+          <div className="whitepieces">
+            <p>Whitepieces</p>
+            <div>
+              {mwhitepiece.map((piece, index) => (
+                <img
+                  key={index}
+                  src={piece}
+                  alt="Black Missing Piece"
+                  className="piece"
+                />
+              ))}
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              undo();
+            }}
+          >
+            Undo
+          </button>
+          <div className="blackpieces">
+            <p>Blackpieces</p>
+            <div>
+              {" "}
+              {mblackpiece.map((piece, index) => (
+                <img
+                  key={index}
+                  src={piece}
+                  alt="Black Missing Piece"
+                  className="piece"
+                />
+              ))}
+            </div>
           </div>
         </div>
-        <button
-          onClick={() => {
-            undo();
-          }}
-        >
-          Undo
-        </button>
-        <div className="blackpieces">
-          <p>Blackpieces</p>
-          <div>
-            {" "}
-            {mblackpiece.map((piece, index) => (
-              <img
-                key={index}
-                src={piece}
-                alt="Black Missing Piece"
-                className="piece"
-              />
-            ))}
-          </div>
-        </div>
       </div>
-    </div>
+    </>
   );
 }
 

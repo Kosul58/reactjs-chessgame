@@ -27,6 +27,10 @@ body {
   overflow: hidden;
 }
 
+.displaynone {
+  display: none !important;
+}
+
 .gameplay {
   display: flex;
   flex-direction: column;
@@ -134,4 +138,26 @@ body {
 
 .piece h1 {
   font-size: 50px;
+}
+
+.starter {
+  all: unset;
+  width: 350px;
+  height: 100px;
+  background-color: rgba(0, 0, 0, 0.5);
+  font-size: 50px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(248, 250, 250, 0.6);
+  cursor: pointer;
+}
+.starter:hover {
+  scale: 1.2;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: black;
+  box-shadow: 0 0 14px black;
+}
+
+span {
+  width: 20px;
+  height: 20px;
 }
