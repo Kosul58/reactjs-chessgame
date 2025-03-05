@@ -18,13 +18,24 @@ import movemypawn from "./piecemoves/movepawn";
 function App() {
   const game = useRef(null);
   const startbtn = useRef(null);
+
+  //board lai set garauna
   const [boardpiece, setBoardpiece] = useState([]);
-  const [turn, setTurn] = useState("w"); //white turn first
+
+  //turn haru maintain garna
+  const [turn, setTurn] = useState("w");
+
   let [piececontroller, setPiececontroller] = useState(false);
+
+  //undo move garna
   const [prespos, setPrespos] = useState([]);
   const [prevpos, setPrevpos] = useState(null);
+
+  //king haru check bhako herna
   const [wkingchecked, setWkingchecked] = useState("");
   const [bkingchecked, setBkingchecked] = useState("");
+
+  //boardkopostion store garna undo garda ko lagi
   let [backupdata, setBackupdata] = useState([]);
   let [missingpieces, setMissingpieces] = useState([]);
   let [mwhitepiece, setMwhite] = useState([]);

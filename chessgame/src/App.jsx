@@ -18,13 +18,24 @@ import movemypawn from "./piecemoves/movepawn";
 function App() {
   const game = useRef(null);
   const startbtn = useRef(null);
+
+  //board lai set garauna
   const [boardpiece, setBoardpiece] = useState([]);
-  const [turn, setTurn] = useState("w"); //white turn first
+
+  //turn haru maintain garna
+  const [turn, setTurn] = useState("w");
+
   let [piececontroller, setPiececontroller] = useState(false);
+
+  //undo move garna
   const [prespos, setPrespos] = useState([]);
   const [prevpos, setPrevpos] = useState(null);
+
+  //king haru check bhako herna
   const [wkingchecked, setWkingchecked] = useState("");
   const [bkingchecked, setBkingchecked] = useState("");
+
+  //boardkopostion store garna undo garda ko lagi
   let [backupdata, setBackupdata] = useState([]);
   let [missingpieces, setMissingpieces] = useState([]);
   let [mwhitepiece, setMwhite] = useState([]);
@@ -840,46 +851,42 @@ function App() {
   };
 
   const showpath = async (row, col, piece) => {
-    let j;
-    checkassure2();
     try {
-      if (piece) {
-        j = piece.split("/").pop().split(".")[0][0];
-        console.log("xx");
-        if (j !== turn && piececontroller == false) {
-          return;
-        }
-      }
-      if (piece == null && piececontroller == false) return;
-      if (piece == null && piececontroller == true) {
+      await checkassure2(); // Ensure async check runs properly
+
+      if (!piece && !piececontroller) return;
+
+      let pieceInitial = piece ? piece.split("/").pop().charAt(0) : null;
+
+      if (piece && pieceInitial !== turn && !piececontroller) return;
+
+      if (!piece && piececontroller) {
         movepiece(row, col, piece);
-        console.log("x1");
-      } else if (piececontroller == true && j !== turn) {
-        console.log("x2");
-        movepiece(row, col, piece);
-      } else {
-        if (piece.includes("wp") || piece.includes("bp")) {
-          movepawn(row, col, piece);
-          setPiececontroller(true);
-        } else if (piece.includes("wk") || piece.includes("bk")) {
-          moveking(row, col, piece);
-          setPiececontroller(true);
-        } else if (piece.includes("wr") || piece.includes("br")) {
-          moverook(row, col, piece);
-          setPiececontroller(true);
-        } else if (piece.includes("wb") || piece.includes("bb")) {
-          movebishop(row, col, piece);
-          setPiececontroller(true);
-        } else if (piece.includes("wn") || piece.includes("bn")) {
-          moveknight(row, col, piece);
-          setPiececontroller(true);
-        } else if (piece.includes("wq") || piece.includes("bq")) {
-          movequeen(row, col, piece);
-          setPiececontroller(true);
-        }
+        return;
       }
-    } catch (e) {
-      console.log(e);
+
+      if (piececontroller && pieceInitial !== turn) {
+        movepiece(row, col, piece);
+        return;
+      }
+
+      const moveFunctions = {
+        p: movepawn,
+        k: moveking,
+        r: moverook,
+        b: movebishop,
+        n: moveknight,
+        q: movequeen,
+      };
+
+      const pieceType = piece?.split("/").pop().slice(1, 2); // Extract piece type (e.g., "q" from "wq.png")
+
+      if (moveFunctions[pieceType]) {
+        moveFunctions[pieceType](row, col, piece);
+        setPiececontroller(true);
+      }
+    } catch (error) {
+      console.error("Error in showpath:", error);
     }
   };
 

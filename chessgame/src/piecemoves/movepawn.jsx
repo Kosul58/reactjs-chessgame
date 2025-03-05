@@ -1,8 +1,4 @@
 const movemypawn = (row, col, piece, a) => {
-  if (!a) {
-    setPrevpos([row, col]);
-    setBoardpiece(piece);
-  }
   const index = row * 8 + col;
   let move1 = null;
   let move2 = null;
