@@ -756,14 +756,10 @@ function App() {
     if (targetpiece) {
       console.log("piece transfered successfully");
       setMissingpieces((predata) => [...predata, targetpiece]);
-      setPrespos((prevdata) => [...prevdata, [row, col, targetpiece]]);
-    } else {
-      console.log("prob");
     }
-
+    setPrespos((prevdata) => [...prevdata, [row, col, targetpiece]]);
     // Create a copy of the board
     const updatedBoard = [...board];
-
     let pawnchange;
 
     if (row == 0 && boardpiece == "/src/assets/wp.png") {
@@ -843,18 +839,15 @@ function App() {
     if (boardpiece) {
       checkassurex(row, col, movedpiece);
     }
-
+    // Clear piececontroller and boardpiece states
+    setPiececontroller(false);
+    setBoardpiece(null);
     // Remove visual highlights
     document.querySelectorAll(".square").forEach((square) => {
       square.classList.remove("selected", "mover");
     });
     console.log("Piece moved successfully!");
-
     setTurn(turn === "w" ? "b" : "w");
-
-    // Clear piececontroller and boardpiece states
-    setPiececontroller(false);
-    setBoardpiece(null);
   };
 
   const showpath = async (row, col, piece) => {
@@ -862,13 +855,13 @@ function App() {
     checkassure2();
     try {
       //turn check garna ko lagi
-      if (piece) {
-        j = piece.split("/").pop().split(".")[0][0];
-        console.log("xx");
-        if (j !== turn && piececontroller == false) {
-          return;
-        }
-      }
+      // if (piece) {
+      //   j = piece.split("/").pop().split(".")[0][0];
+      //   console.log("xx");
+      //   if (j !== turn && piececontroller == false) {
+      //     return;
+      //   }
+      // }
       if (piece == null && piececontroller == false) return;
       if (piece == null && piececontroller == true) {
         movepiece(row, col, piece);
