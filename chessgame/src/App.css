@@ -18,10 +18,9 @@ body {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  width: 80svw;
-  aspect-ratio: 16/10;
+  width: 900px;
+  height: 600px;
   background-color: rgba(210, 196, 224, 0.6);
-  backdrop-filter: blur(10px);
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   overflow: hidden;
@@ -41,7 +40,6 @@ body {
   width: 70%;
   height: 95%;
   background-color: rgba(141, 207, 225, 0.6);
-  backdrop-filter: blur(10px);
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   overflow: hidden;
@@ -55,7 +53,6 @@ body {
   width: 25%;
   height: 95%;
   background-color: rgba(98, 19, 177, 0.6);
-  backdrop-filter: blur(10px);
   border-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   align-items: center;
@@ -80,9 +77,8 @@ body {
 .row {
   display: flex;
   width: 92%;
-  height: 55px;
+  height: fit-content;
   flex-direction: row;
-  padding: 10px 10px;
   gap: 10px;
   align-items: center;
   justify-content: center;
@@ -90,10 +86,9 @@ body {
 
 .square {
   display: flex;
-  width: 90px;
-  height: 80px;
+  width: 80px;
+  height: 60px;
   flex-direction: row;
-  backdrop-filter: blur(10px);
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   background-size: cover;
