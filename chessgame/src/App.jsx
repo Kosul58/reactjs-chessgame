@@ -581,11 +581,10 @@ function App() {
     for (let i = 0; i < board.length; i++) {
       const boardpiece = board[i];
       if (!boardpiece) {
-        return;
+        continue;
       } else {
         const row = Math.floor(i / 8);
         const col = i % 8;
-
         const moveFunction = moveFunctions[boardpiece];
         const targetKing = targetKings[boardpiece];
         // Get possible moves for the current piece
