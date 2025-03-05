@@ -851,46 +851,43 @@ function App() {
   };
 
   const showpath = async (row, col, piece) => {
-    let j;
-    checkassure2();
     try {
-      if (piece) {
-        j = piece.split("/").pop().split(".")[0][0];
-        console.log("xx");
-        if (j !== turn && piececontroller == false) {
-          return;
-        }
-      }
-      if (piece == null && piececontroller == false) return;
-      if (piece == null && piececontroller == true) {
+      await checkassure2();
+
+      if (!piece && !piececontroller) return;
+
+      let pieceInitial = piece ? piece.split("/").pop().charAt(0) : null;
+
+      if (piece && pieceInitial !== turn && !piececontroller) return;
+
+      if (!piece || (piececontroller && pieceInitial !== turn)) {
+        console.log(piece ? "x2222" : "x1111");
         movepiece(row, col, piece);
-        console.log("x1111");
-      } else if (piececontroller == true && j !== turn) {
-        console.log("x2222");
-        movepiece(row, col, piece);
-      } else {
-        if (piece.includes("wp") || piece.includes("bp")) {
-          movepawn(row, col, piece);
-          setPiececontroller(true);
-        } else if (piece.includes("wk") || piece.includes("bk")) {
-          moveking(row, col, piece);
-          setPiececontroller(true);
-        } else if (piece.includes("wr") || piece.includes("br")) {
-          moverook(row, col, piece);
-          setPiececontroller(true);
-        } else if (piece.includes("wb") || piece.includes("bb")) {
-          movebishop(row, col, piece);
-          setPiececontroller(true);
-        } else if (piece.includes("wn") || piece.includes("bn")) {
-          moveknight(row, col, piece);
-          setPiececontroller(true);
-        } else if (piece.includes("wq") || piece.includes("bq")) {
-          movequeen(row, col, piece);
-          setPiececontroller(true);
-        }
+        return;
       }
-    } catch (e) {
-      console.log(e);
+
+      // Handle each piece separately
+      if (piece.includes("wp") || piece.includes("bp")) {
+        movepawn(row, col, piece);
+        setPiececontroller(true);
+      } else if (piece.includes("wk") || piece.includes("bk")) {
+        moveking(row, col, piece);
+        setPiececontroller(true);
+      } else if (piece.includes("wr") || piece.includes("br")) {
+        moverook(row, col, piece);
+        setPiececontroller(true);
+      } else if (piece.includes("wb") || piece.includes("bb")) {
+        movebishop(row, col, piece);
+        setPiececontroller(true);
+      } else if (piece.includes("wn") || piece.includes("bn")) {
+        moveknight(row, col, piece);
+        setPiececontroller(true);
+      } else if (piece.includes("wq") || piece.includes("bq")) {
+        movequeen(row, col, piece);
+        setPiececontroller(true);
+      }
+    } catch (error) {
+      console.error("Error in showpath:", error);
     }
   };
 
