@@ -13,6 +13,8 @@ import wr from "./assets/wr.png";
 import wq from "./assets/wq.png";
 import wp from "./assets/wp.png";
 
+import movemypawn from "./piecemoves/movepawn";
+
 function App() {
   const game = useRef(null);
   const startbtn = useRef(null);
