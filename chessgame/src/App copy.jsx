@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./App.css";
 import bk from "./assets/bk.png";
 import bb from "./assets/bb.png";
@@ -13,15 +13,22 @@ import wr from "./assets/wr.png";
 import wq from "./assets/wq.png";
 import wp from "./assets/wp.png";
 
+import movemypawn from "./piecemoves/movepawn";
+
 function App() {
+  const game = useRef(null);
+  const startbtn = useRef(null);
   const [boardpiece, setBoardpiece] = useState([]);
   const [turn, setTurn] = useState("w"); //white turn first
   let [piececontroller, setPiececontroller] = useState(false);
+  const [prespos, setPrespos] = useState([]);
   const [prevpos, setPrevpos] = useState(null);
   const [wkingchecked, setWkingchecked] = useState("");
   const [bkingchecked, setBkingchecked] = useState("");
-  const bkingmoverestrict = [];
-  const wkingmoverestrict = [];
+  let [backupdata, setBackupdata] = useState([]);
+  let [missingpieces, setMissingpieces] = useState([]);
+  let [mwhitepiece, setMwhite] = useState([]);
+  let [mblackpiece, setMblack] = useState([]);
 
   // Define major pieces for black and white
   const blackMajorPieces = [br, bn, bb, bq, bk, bb, bn, br];
@@ -33,8 +40,8 @@ function App() {
   // Set black and white pieces dynamically
   blackMajorPieces.forEach((piece, i) => {
     initialBoard[i] = piece; // Black pieces (row 0)
-    // initialBoard[8 + i] = bp; // Black pawns (row 1)
-    // initialBoard[48 + i] = wp; // White pawns (row 6)
+    initialBoard[8 + i] = bp; // Black pawns (row 1)
+    initialBoard[48 + i] = wp; // White pawns (row 6)
     initialBoard[56 + i] = whiteMajorPieces[i]; // White pieces (row 7)
   });
 
@@ -55,7 +62,7 @@ function App() {
       move1 = (row - 1) * 8 + col; // Single forward move for white pawn
       if (row === 6) move2 = (row - 2) * 8 + col; // Double forward move for white pawn
 
-      if (col < 7) side2 = (row - 1) * 8 + (col + 1);
+      if (col < 8) side2 = (row - 1) * 8 + (col + 1);
       if (col != 0) {
         side1 = (row - 1) * 8 + (col - 1);
       } else {
@@ -79,17 +86,17 @@ function App() {
       move1 = null;
       move2 = null;
     }
+
     if (board[side1] && board[side2]) {
       if (piece !== board[side1] && piece !== board[side2]) {
-        move3 = move1;
-        move1 = side1;
-        move4 = move2;
-        move2 = side2;
+        move2 = side1;
+        move3 = side2;
       }
     }
     if (board[side1]) {
       const j = board[side1].includes(turn);
       if (piece !== board[side1] && j === false) {
+        move3 = move2;
         move2 = move1;
         move1 = side1;
       }
@@ -97,6 +104,7 @@ function App() {
     if (board[side2]) {
       const j = board[side2].includes(turn);
       if (piece !== board[side2] && j === false) {
+        move3 = move2;
         move2 = move1;
         move1 = side2;
       }
@@ -345,7 +353,7 @@ function App() {
     return moves;
   };
 
-  const moveking = (row, col, piece, a) => {
+  const moveking = async (row, col, piece, a) => {
     const index = row * 8 + col;
     if (!a) {
       setPrevpos([row, col]);
@@ -363,7 +371,7 @@ function App() {
       { dr: 1, dc: 1 }, // Down-Right
     ];
 
-    const moves = [];
+    let moves = [];
     const currentColor = piece.split("/").pop().split(".")[0][0];
 
     kingMoves.forEach(({ dr, dc }) => {
@@ -433,6 +441,17 @@ function App() {
         }
       }
     }
+
+    if (!a) {
+      const { movesw, movesb } = await checkassure2();
+      console.log(movesw, movesb);
+      if (turn === "w") {
+        moves = moves.filter((k) => !movesb.has(k)); // Remove moves that are in movesb
+      } else if (turn === "b") {
+        moves = moves.filter((k) => !movesw.has(k)); // Remove moves that are in movesw
+      }
+    }
+
     if (!a) {
       document.querySelectorAll(".square").forEach((square, i) => {
         square.classList.remove("selected", "mover");
@@ -453,7 +472,6 @@ function App() {
   };
 
   const checkassurex = (row, col, boardpiece) => {
-    console.log("101");
     // Map board pieces to their respective move functions
     const moveFunctions = {
       "/src/assets/wq.png": movequeen,
@@ -502,12 +520,12 @@ function App() {
     for (let i = 0; i < possibleMoves.length; i++) {
       const targetIndex = possibleMoves[i];
       if (board[targetIndex] === targetKing) {
-        document.querySelectorAll(".square").forEach((square, i) => {
-          // square.classList.remove("check");
-          if (i == targetIndex) {
-            square.classList.add("check");
-          }
-        });
+        // document.querySelectorAll(".square").forEach((square, i) => {
+        //   square.classList.remove("check");
+        //   if (i == targetIndex) {
+        //     square.classList.add("check");
+        //   }
+        // });
         console.log(
           `${
             targetKing === "/src/assets/bk.png" ? "Black" : "White"
@@ -526,7 +544,6 @@ function App() {
   };
 
   const checkassure2 = async () => {
-    console.log("202");
     // Map board pieces to their respective move functions
     const moveFunctions = {
       "/src/assets/wq.png": movequeen,
@@ -542,7 +559,8 @@ function App() {
       "/src/assets/wk.png": moveking,
       "/src/assets/bk.png": moveking,
     };
-
+    const movesw = new Set();
+    const movesb = new Set();
     // Map board pieces to the respective kings they might check
     const targetKings = {
       "/src/assets/wq.png": "/src/assets/bk.png",
@@ -559,27 +577,37 @@ function App() {
       "/src/assets/bp.png": "/src/assets/wk.png",
       "/src/assets/bk.png": "/src/assets/wk.png",
     };
-    const moves = [];
+    let totalmoves = [];
     for (let i = 0; i < board.length; i++) {
       const boardpiece = board[i];
-      if (boardpiece) {
+      if (!boardpiece) {
+        continue;
+      } else {
         const row = Math.floor(i / 8);
         const col = i % 8;
         const moveFunction = moveFunctions[boardpiece];
+        if (!moveFunction) continue;
         const targetKing = targetKings[boardpiece];
         // Get possible moves for the current piece
-        const possibleMoves = moveFunction(row, col, boardpiece, 10);
+        const possibleMoves = moveFunction(row, col, boardpiece, 10) || [];
+        if (Array.isArray(possibleMoves)) {
+          totalmoves.push(...possibleMoves);
+        }
         // Check if any of the moves threaten the target king
         for (let i = 0; i < possibleMoves.length; i++) {
           const targetIndex = possibleMoves[i];
+          if (targetKing == "/src/assets/bk.png") {
+            movesw.add(targetIndex);
+          } else if (targetKing == "/src/assets/wk.png") {
+            movesb.add(targetIndex);
+          }
           if (board[targetIndex] === targetKing) {
-            moves.push(targetIndex);
-            document.querySelectorAll(".square").forEach((square, i) => {
-              // square.classList.remove("check");
-              if (i == targetIndex) {
-                square.classList.add("check");
-              }
-            });
+            // document.querySelectorAll(".square").forEach((square, i) => {
+            //   square.classList.remove("check");
+            //   if (i == targetIndex) {
+            //     square.classList.add("check");
+            //   }
+            // });
             console.log(
               `The ${targetKing} is being targeted at ${targetIndex} by ${boardpiece} at ${row} ,${col}`
             );
@@ -595,32 +623,179 @@ function App() {
             }
           }
         }
-
-        for (let i = 0; i < moves.length; i++) {
-          console.log(moves[i]);
-        }
       }
     }
+    // console.log(bkingpos, wkingpos, movesb, movesw);
+    // if (movesb.has(wkingpos)) {
+    //   console.log("save wking");
+    // } else if (movesw.has(bkingpos)) {
+    //   console.log("save bking");
+    // }
+    return { movesw, movesb };
   };
 
-  const movepiece = async (row, col, piece) => {
+  //function to reset the game after game over
+  const resetGame = () => {
+    // Define the initial board setup (update as needed)
+    const initialBoard = [
+      "/src/assets/br.png",
+      "/src/assets/bn.png",
+      "/src/assets/bb.png",
+      "/src/assets/bq.png",
+      "/src/assets/bk.png",
+      "/src/assets/bb.png",
+      "/src/assets/bn.png",
+      "/src/assets/br.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wr.png",
+      "/src/assets/wn.png",
+      "/src/assets/wb.png",
+      "/src/assets/wq.png",
+      "/src/assets/wk.png",
+      "/src/assets/wb.png",
+      "/src/assets/wn.png",
+      "/src/assets/wr.png",
+    ];
+
+    setBoard(initialBoard); // Reset the board
+    setTurn("w"); // Reset turn to White
+    setMissingpieces([]); // Clear captured pieces
+    setPrespos([]); // Clear previous positions
+    setBackupdata([]); // Clear move history
+    setPiececontroller(false);
+    setBoardpiece(null);
+
+    // Remove any visual highlights
+    document.querySelectorAll(".square").forEach((square) => {
+      square.classList.remove("selected", "mover");
+    });
+
+    console.log("Game has been reset.");
+  };
+
+  const movepiece = async (row, col) => {
     console.log("Attempting to move piece...");
     // Check if the move is valid
     if (!selectcheck(row, col)) {
       console.log("Invalid move: The square is not selected.");
       return;
     }
-
     console.log("Valid move detected.");
     // Indices for the target and previous squares
     const targetIndex = row * 8 + col;
     const [prevRow, prevCol] = prevpos;
     const prevIndex = prevRow * 8 + prevCol;
-
+    const targetpiece = board[targetIndex];
+    if (
+      targetpiece == "/src/assets/bk.png" ||
+      targetpiece == "/src/assets/wk.png"
+    ) {
+      const piece = targetpiece == "/src/assets/bk.png" ? "White" : "Black";
+      resetGame();
+      alert(`Game over. Winner is: ${piece}`);
+      return;
+    }
+    if (targetpiece) {
+      console.log("piece transfered successfully");
+      setMissingpieces((predata) => [...predata, targetpiece]);
+    }
+    setPrespos((prevdata) => [...prevdata, [row, col, targetpiece]]);
     // Create a copy of the board
     const updatedBoard = [...board];
+    let pawnchange;
+
+    if (row == 0 && boardpiece == "/src/assets/wp.png") {
+      const j = prompt("Which one do you want? Queen, Rook, Knight, Bishop");
+      switch (j.toLowerCase()) {
+        case "queen":
+          pawnchange = "/src/assets/wq.png";
+          break;
+        case "rook":
+          pawnchange = "/src/assets/wr.png";
+          break;
+        case "knight":
+          pawnchange = "/src/assets/wn.png";
+          break;
+        case "bishop":
+          pawnchange = "/src/assets/wb.png";
+          break;
+        default:
+          alert("Invalid choice! Defaulting to Queen.");
+          pawnchange = "/src/assets/wq.png";
+      }
+    } else if (row == 7 && boardpiece == "/src/assets/bp.png") {
+      const j = prompt("Which one do you want? Queen, Rook, Knight, Bishop");
+      switch (j.toLowerCase()) {
+        case "queen":
+          pawnchange = "/src/assets/bq.png";
+          break;
+        case "rook":
+          pawnchange = "/src/assets/br.png";
+          break;
+        case "knight":
+          pawnchange = "/src/assets/bn.png";
+          break;
+        case "bishop":
+          pawnchange = "/src/assets/bb.png";
+          break;
+        default:
+          alert("Invalid choice! Defaulting to Queen.");
+          pawnchange = "/src/assets/bq.png";
+      }
+    }
+
+    setBackupdata((prevData) => [...prevData, [prevRow, prevCol, boardpiece]]);
+
     // Move the piece
-    updatedBoard[targetIndex] = boardpiece;
+    const movedpiece = pawnchange || boardpiece;
+    updatedBoard[targetIndex] = movedpiece;
     updatedBoard[prevIndex] = null;
 
     // Handle castling logic for the king
@@ -634,7 +809,6 @@ function App() {
         right: { rookIndex: 7, rookTarget: 5 },
       },
     };
-
     if (castlingMoves[boardpiece]) {
       const moveDirection =
         prevCol - col > 1 ? "left" : col - prevCol > 1 ? "right" : null;
@@ -647,11 +821,12 @@ function App() {
           : "/src/assets/br.png"; // Place the rook in its new position
       }
     }
+
     // Update the board state
     setBoard(updatedBoard);
 
     if (boardpiece) {
-      checkassurex(row, col, boardpiece);
+      checkassurex(row, col, movedpiece);
     }
     // Clear piececontroller and boardpiece states
     setPiececontroller(false);
@@ -701,53 +876,158 @@ function App() {
         } else if (piece.includes("wq") || piece.includes("bq")) {
           movequeen(row, col, piece);
           setPiececontroller(true);
-        } else if (piece.includes("wk") || piece.includes("bk")) {
-          moveking(row, col, piece);
-          setPiececontroller(true);
         }
       }
     } catch (e) {
       console.log(e);
-    } finally {
     }
+  };
+
+  const undo = () => {
+    console.log(backupdata);
+    if (backupdata.length === 0) {
+      alert("No moves to undo!");
+      return;
+    }
+
+    // Pop the last move from backupdata
+
+    const updatedBoard = [...board];
+    const present = prespos.pop();
+    const [presr, presc, presp] = present;
+    const pres = presr * 8 + presc;
+    updatedBoard[pres] = presp;
+    const lastMove = backupdata.pop();
+    const [row, col, movedPiece] = lastMove;
+    const target = row * 8 + col;
+    updatedBoard[target] = movedPiece;
+    setBoard(updatedBoard);
+    setTurn(turn === "w" ? "b" : "w");
+  };
+
+  const checkmissingpieces = () => {
+    let white = [];
+    let black = [];
+
+    for (let i = 0; i < missingpieces.length; i++) {
+      const piece = missingpieces[i];
+      console.log(piece);
+      if (piece.includes("w")) {
+        white.push(piece);
+      } else {
+        black.push(piece);
+      }
+    }
+
+    setMwhite(white);
+    setMblack(black);
+  };
+
+  const startgame = () => {
+    startbtn.current.classList.add("displaynone");
+    game.current.classList.remove("displaynone");
   };
 
   const [board, setBoard] = useState(initialBoard); // State to track the board
 
   useEffect(() => {
     checkassure2();
+    checkmissingpieces();
   }, [board]);
 
-  const renderBoard = useMemo(() => {
-    return [...Array(8)].map((_, rowIndex) => (
-      <div className="row" key={rowIndex}>
-        {[...Array(8)].map((_, colIndex) => {
-          const index = rowIndex * 8 + colIndex;
-          return (
-            <div
-              key={colIndex}
-              className="square"
-              style={{
-                backgroundColor:
-                  (rowIndex + colIndex) % 2 === 0 ? "white" : "black",
-                backgroundImage: board[index] ? `url(${board[index]})` : "none",
-                backgroundSize: "contain",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-              }}
-              onClick={() => showpath(rowIndex, colIndex, board[index])}
-            ></div>
-          );
-        })}
-      </div>
-    ));
-  }, [board, showpath]);
-
   return (
-    <div className="chessgame">
-      <div className="gameplay">{renderBoard}</div>
-      <div className="gamecontrol"></div>
-    </div>
+    <>
+      <button
+        onClick={() => {
+          startgame();
+        }}
+        ref={startbtn}
+        className="starter"
+      >
+        Start Game
+      </button>
+      <div className="chessgame displaynone" ref={game}>
+        <div className="gameplay">
+          {[...Array(8)].map((_, rowIndex) => (
+            <div className="row" key={rowIndex}>
+              {[...Array(8)].map((_, colIndex) => {
+                const index = rowIndex * 8 + colIndex; // Calculate the index
+                return (
+                  <div
+                    key={colIndex}
+                    className="square"
+                    style={{
+                      backgroundColor:
+                        (rowIndex + colIndex) % 2 === 0 ? "white" : "black",
+                      backgroundImage: board[index]
+                        ? `url(${board[index]})`
+                        : "none",
+                      backgroundSize: "contain",
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
+                    }}
+                    onClick={() => {
+                      showpath(rowIndex, colIndex, board[index]);
+                    }}
+                  ></div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div className="gamecontrol">
+          <div
+            style={{
+              height: "50px",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "10px",
+            }}
+          >
+            <p>Turn: </p>
+            <span
+              style={{ backgroundColor: turn == "w" ? "white" : "black" }}
+            ></span>
+          </div>
+          <div className="whitepieces">
+            <p>Whitepieces</p>
+            <div>
+              {mwhitepiece.map((piece, index) => (
+                <img
+                  key={index}
+                  src={piece}
+                  alt="Black Missing Piece"
+                  className="piece"
+                />
+              ))}
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              undo();
+            }}
+          >
+            Undo
+          </button>
+          <div className="blackpieces">
+            <p>Blackpieces</p>
+            <div>
+              {" "}
+              {mblackpiece.map((piece, index) => (
+                <img
+                  key={index}
+                  src={piece}
+                  alt="Black Missing Piece"
+                  className="piece"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
