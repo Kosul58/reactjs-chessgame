@@ -864,9 +864,9 @@ function App() {
       if (piece == null && piececontroller == false) return;
       if (piece == null && piececontroller == true) {
         movepiece(row, col, piece);
-        console.log("x1");
+        console.log("x1111");
       } else if (piececontroller == true && j !== turn) {
-        console.log("x2");
+        console.log("x2222");
         movepiece(row, col, piece);
       } else {
         if (piece.includes("wp") || piece.includes("bp")) {
