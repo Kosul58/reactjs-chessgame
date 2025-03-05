@@ -632,6 +632,92 @@ function App() {
     return { movesw, movesb };
   };
 
+  //function to reset the game after game over
+  const resetGame = () => {
+    // Define the initial board setup (update as needed)
+    const initialBoard = [
+      "/src/assets/br.png",
+      "/src/assets/bn.png",
+      "/src/assets/bb.png",
+      "/src/assets/bq.png",
+      "/src/assets/bk.png",
+      "/src/assets/bb.png",
+      "/src/assets/bn.png",
+      "/src/assets/br.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      "/src/assets/bp.png",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wp.png",
+      "/src/assets/wr.png",
+      "/src/assets/wn.png",
+      "/src/assets/wb.png",
+      "/src/assets/wq.png",
+      "/src/assets/wk.png",
+      "/src/assets/wb.png",
+      "/src/assets/wn.png",
+      "/src/assets/wr.png",
+    ];
+
+    setBoard(initialBoard); // Reset the board
+    setTurn("w"); // Reset turn to White
+    setMissingpieces([]); // Clear captured pieces
+    setPrespos([]); // Clear previous positions
+    setBackupdata([]); // Clear move history
+    setPiececontroller(false);
+    setBoardpiece(null);
+
+    // Remove any visual highlights
+    document.querySelectorAll(".square").forEach((square) => {
+      square.classList.remove("selected", "mover");
+    });
+
+    console.log("Game has been reset.");
+  };
+
   const movepiece = async (row, col) => {
     console.log("Attempting to move piece...");
     // Check if the move is valid
@@ -645,6 +731,15 @@ function App() {
     const [prevRow, prevCol] = prevpos;
     const prevIndex = prevRow * 8 + prevCol;
     const targetpiece = board[targetIndex];
+    if (
+      targetpiece == "/src/assets/bk.png" ||
+      targetpiece == "/src/assets/wk.png"
+    ) {
+      const piece = targetpiece == "/src/assets/bk.png" ? "White" : "Black";
+      resetGame();
+      alert(`Game over. Winner is: ${piece}`);
+      return;
+    }
     if (targetpiece) {
       console.log("piece transfered successfully");
       setMissingpieces((predata) => [...predata, targetpiece]);
