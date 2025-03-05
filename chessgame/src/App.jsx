@@ -586,6 +586,7 @@ function App() {
         const row = Math.floor(i / 8);
         const col = i % 8;
         const moveFunction = moveFunctions[boardpiece];
+        if (!moveFunction) continue;
         const targetKing = targetKings[boardpiece];
         // Get possible moves for the current piece
         const possibleMoves = moveFunction(row, col, boardpiece, 10) || [];
