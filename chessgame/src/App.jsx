@@ -756,12 +756,14 @@ function App() {
     if (targetpiece) {
       console.log("piece transfered successfully");
       setMissingpieces((predata) => [...predata, targetpiece]);
+      setPrespos((prevdata) => [...prevdata, [row, col, targetpiece]]);
     } else {
       console.log("prob");
     }
-    setPrespos((prevdata) => [...prevdata, [row, col, targetpiece]]);
+
     // Create a copy of the board
     const updatedBoard = [...board];
+
     let pawnchange;
 
     if (row == 0 && boardpiece == "/src/assets/wp.png") {
