@@ -756,6 +756,8 @@ function App() {
     if (targetpiece) {
       console.log("piece transfered successfully");
       setMissingpieces((predata) => [...predata, targetpiece]);
+    } else {
+      console.log("prob");
     }
     setPrespos((prevdata) => [...prevdata, [row, col, targetpiece]]);
     // Create a copy of the board
@@ -845,6 +847,7 @@ function App() {
       square.classList.remove("selected", "mover");
     });
     console.log("Piece moved successfully!");
+
     setTurn(turn === "w" ? "b" : "w");
 
     // Clear piececontroller and boardpiece states
