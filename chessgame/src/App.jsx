@@ -472,7 +472,6 @@ function App() {
   };
 
   const checkassurex = (row, col, boardpiece) => {
-    console.log("101");
     // Map board pieces to their respective move functions
     const moveFunctions = {
       "/src/assets/wq.png": movequeen,
@@ -545,7 +544,6 @@ function App() {
   };
 
   const checkassure2 = async () => {
-    console.log("202");
     // Map board pieces to their respective move functions
     const moveFunctions = {
       "/src/assets/wq.png": movequeen,
@@ -582,7 +580,9 @@ function App() {
     let totalmoves = [];
     for (let i = 0; i < board.length; i++) {
       const boardpiece = board[i];
-      if (boardpiece) {
+      if (!boardpiece) {
+        return;
+      } else {
         const row = Math.floor(i / 8);
         const col = i % 8;
 
